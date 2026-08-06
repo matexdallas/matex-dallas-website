@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" role="img" aria-label="Placeholder: event photograph needed">
+  <defs>
+    <pattern id="hatch" width="16" height="16" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+      <line x1="0" y1="0" x2="0" y2="16" stroke="#D9CDB5" stroke-width="1.5"/>
+    </pattern>
+  </defs>
+  <rect width="800" height="600" fill="#F6F1E7"/>
+  <rect width="800" height="600" fill="url(#hatch)"/>
+  <rect x="4" y="4" width="792" height="592" fill="none" stroke="#E2D8C3" stroke-width="4"/>
+  <g transform="translate(400,270)">
+    <rect x="-55" y="-36" width="110" height="76" rx="8" fill="none" stroke="#1B2A4A" stroke-width="4"/>
+    <circle cx="-30" cy="-14" r="8" fill="#1B2A4A"/>
+    <path d="M-55 24 L-16 -6 L11 16 L55 -22 L55 36 L-55 36 Z" fill="#1B2A4A" opacity="0.55"/>
+  </g>
+  <text x="400" y="368" text-anchor="middle" font-family="Georgia, serif" font-size="26" font-weight="700" fill="#1B2A4A">Event Photo Needed</text>
+  <text x="400" y="396" text-anchor="middle" font-family="Arial, sans-serif" font-size="15" fill="#7A6F5A">Replace with real photography</text>
+</svg>

@@ -1,0 +1,6 @@
+# Local dev tooling (not part of the deployed site)
+.claude/
+
+# OS cruft
+.DS_Store
+Thumbs.db

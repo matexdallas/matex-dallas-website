@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600" role="img" aria-label="Placeholder: gallery photograph needed">
+  <defs>
+    <pattern id="hatch" width="14" height="14" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+      <line x1="0" y1="0" x2="0" y2="14" stroke="#D9CDB5" stroke-width="1.5"/>
+    </pattern>
+  </defs>
+  <rect width="600" height="600" fill="#F6F1E7"/>
+  <rect width="600" height="600" fill="url(#hatch)"/>
+  <rect x="4" y="4" width="592" height="592" fill="none" stroke="#E2D8C3" stroke-width="4"/>
+  <g transform="translate(300,270)">
+    <rect x="-50" y="-33" width="100" height="70" rx="8" fill="none" stroke="#1B2A4A" stroke-width="4"/>
+    <circle cx="-27" cy="-13" r="7" fill="#1B2A4A"/>
+    <path d="M-50 22 L-14 -6 L10 15 L50 -20 L50 33 L-50 33 Z" fill="#1B2A4A" opacity="0.55"/>
+  </g>
+  <text x="300" y="358" text-anchor="middle" font-family="Georgia, serif" font-size="22" font-weight="700" fill="#1B2A4A">Gallery Photo Needed</text>
+</svg>

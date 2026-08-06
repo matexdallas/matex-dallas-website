@@ -1,0 +1,123 @@
+/* ==========================================================================
+   MATEX Dallas — Base
+   Font loading, reset, and default element styling. Everything here is a
+   global default; page- or component-specific rules belong in layout.css
+   or components.css instead.
+   ========================================================================== */
+
+@font-face {
+  font-family: "Fraunces";
+  font-style: normal;
+  font-weight: 300 700;
+  font-display: swap;
+  src: url("../fonts/fraunces-variable.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Public Sans";
+  font-style: normal;
+  font-weight: 300 700;
+  font-display: swap;
+  src: url("../fonts/public-sans-variable.woff2") format("woff2");
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html {
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+}
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+}
+
+img, svg { max-width: 100%; display: block; }
+
+h1, h2, h3, h4 {
+  font-family: var(--font-display);
+  color: var(--navy);
+  line-height: 1.15;
+  text-wrap: balance;
+  margin: 0 0 var(--space-4);
+  font-weight: 600;
+}
+h1 { font-size: clamp(2.1rem, 4.5vw, 3.1rem); }
+h2 { font-size: clamp(1.6rem, 3vw, 2.1rem); }
+h3 { font-size: 1.25rem; }
+h4 { font-size: 1.05rem; }
+
+p { margin: 0 0 var(--space-4); max-width: 68ch; }
+
+a {
+  color: var(--navy);
+  text-decoration-thickness: 1.5px;
+  text-underline-offset: 2px;
+}
+a:hover { color: var(--red); }
+
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible,
+[tabindex]:focus-visible {
+  outline: 3px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+ul, ol { margin: 0 0 var(--space-4); padding-left: 1.3em; }
+ul.unstyled, ol.unstyled { margin: 0; padding: 0; list-style: none; }
+
+button { font-family: inherit; }
+
+.eyebrow {
+  display: block;
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--red);
+  margin: 0 0 var(--space-2);
+}
+
+.skip-link {
+  position: absolute;
+  left: 50%;
+  transform: translate(-50%, -140%);
+  background: var(--navy);
+  color: var(--bg);
+  padding: 12px 20px;
+  border-radius: 0 0 var(--radius-sm) var(--radius-sm);
+  z-index: 100;
+  font-weight: 700;
+  transition: transform 0.15s var(--ease);
+}
+.skip-link:focus {
+  transform: translate(-50%, 0%);
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px; height: 1px;
+  padding: 0; margin: -1px;
+  overflow: hidden;
+  clip: rect(0,0,0,0);
+  white-space: nowrap;
+  border: 0;
+}

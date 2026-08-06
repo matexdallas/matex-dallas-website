@@ -1,0 +1,165 @@
+/* ==========================================================================
+   MATEX Dallas — Layout
+   Page structure: containers, header/nav, section rhythm, grids, footer.
+   ========================================================================== */
+
+.container {
+  max-width: var(--container);
+  margin-inline: auto;
+  padding-inline: var(--space-5);
+}
+.container-narrow {
+  max-width: var(--container-narrow);
+  margin-inline: auto;
+  padding-inline: var(--space-5);
+}
+
+/* ---------- Header ---------- */
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: var(--bg-raised);
+  border-bottom: 1px solid var(--line);
+}
+.site-header .container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-5);
+  padding-block: var(--space-3);
+}
+.site-header .brand img { height: 40px; width: auto; }
+
+.main-nav { display: flex; align-items: center; gap: var(--space-6); }
+.main-nav ul { display: flex; gap: var(--space-5); }
+.main-nav a {
+  color: var(--ink);
+  font-weight: 600;
+  font-size: 0.95rem;
+  text-decoration: none;
+}
+.main-nav a:hover, .main-nav a[aria-current="page"] { color: var(--red); }
+
+.nav-toggle {
+  display: none;
+  background: none;
+  border: 1.5px solid var(--line);
+  border-radius: var(--radius-sm);
+  padding: 8px 10px;
+  cursor: pointer;
+}
+.nav-toggle .bar {
+  display: block;
+  width: 22px;
+  height: 2px;
+  background: var(--navy);
+  margin: 4px 0;
+  transition: transform 0.2s var(--ease), opacity 0.2s var(--ease);
+}
+.nav-toggle[aria-expanded="true"] .bar:nth-child(1) { transform: translateY(6px) rotate(45deg); }
+.nav-toggle[aria-expanded="true"] .bar:nth-child(2) { opacity: 0; }
+.nav-toggle[aria-expanded="true"] .bar:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
+
+@media (max-width: 860px) {
+  .nav-toggle { display: block; }
+  .main-nav {
+    position: absolute;
+    top: 100%; left: 0; right: 0;
+    background: var(--bg-raised);
+    border-bottom: 1px solid var(--line);
+    flex-direction: column;
+    align-items: stretch;
+    padding: var(--space-4) var(--space-5) var(--space-5);
+    display: none;
+  }
+  .main-nav.open { display: flex; }
+  .main-nav ul { flex-direction: column; gap: 0; }
+  .main-nav ul li { border-bottom: 1px solid var(--line); }
+  .main-nav ul li a { display: block; padding: var(--space-3) 0; }
+  .main-nav .nav-cta { margin-top: var(--space-4); }
+}
+
+/* ---------- Section rhythm ---------- */
+.section { padding-block: var(--space-8); border-bottom: 1px solid var(--line); }
+.section:last-of-type { border-bottom: none; }
+.section-head { max-width: 60ch; margin-bottom: var(--space-6); }
+.section-head.center { margin-inline: auto; text-align: center; }
+.section--tight { padding-block: var(--space-7); }
+.section--raised { background: var(--bg-raised); }
+
+/* ---------- Grids ---------- */
+.grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-5); }
+.grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--space-5); }
+.grid-5 { display: grid; grid-template-columns: repeat(5, 1fr); gap: var(--space-4); }
+@media (max-width: 860px) {
+  .grid-3, .grid-4 { grid-template-columns: repeat(2, 1fr); }
+  .grid-5 { grid-template-columns: repeat(3, 1fr); }
+}
+@media (max-width: 560px) {
+  .grid-3, .grid-4, .grid-5 { grid-template-columns: 1fr 1fr; }
+}
+
+/* ---------- Hero ---------- */
+.hero { position: relative; padding-block: var(--space-9) var(--space-8); overflow: hidden; }
+.hero .bg {
+  position: absolute; inset: 0;
+  z-index: 0;
+}
+.hero .bg img { width: 100%; height: 100%; object-fit: cover; }
+.hero .bg::after {
+  content: "";
+  position: absolute; inset: 0;
+  background: linear-gradient(180deg, rgba(27,42,74,0.55), rgba(27,42,74,0.75));
+}
+.hero .container { position: relative; z-index: 1; }
+.hero-content { max-width: 640px; }
+.hero .eyebrow { color: var(--gold); }
+.hero h1 { color: #FFFFFF; }
+.hero p.lede { color: #F0EAD9; font-size: 1.15rem; max-width: 52ch; }
+.hero .cta-row { display: flex; flex-wrap: wrap; gap: var(--space-3); margin-top: var(--space-5); }
+
+/* ---------- Interior page header ---------- */
+/* Simpler navy band used on every page except Home, which gets the full
+   photo hero. Keeps interior pages lightweight until real photography
+   exists, and visually reserves the big photo moment for Home. */
+.page-header { background: var(--navy); padding-block: var(--space-8) var(--space-7); }
+.page-header .eyebrow { color: var(--gold); }
+.page-header h1 { color: #FFFFFF; margin-bottom: var(--space-3); }
+.page-header p { color: #F0EAD9; max-width: 60ch; margin: 0; }
+
+/* ---------- Mission band ---------- */
+.mission {
+  text-align: center;
+  padding-block: var(--space-8);
+}
+.mission blockquote {
+  font-family: var(--font-display);
+  font-size: clamp(1.3rem, 2.6vw, 1.7rem);
+  color: var(--navy);
+  max-width: 46ch;
+  margin: 0 auto;
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+/* ---------- Footer ---------- */
+.site-footer { background: var(--navy); color: var(--sand); padding-block: var(--space-8) var(--space-6); }
+.footer-grid { display: grid; grid-template-columns: 1.4fr 1fr 1fr 1fr; gap: var(--space-6); margin-bottom: var(--space-7); }
+@media (max-width: 760px) {
+  .footer-grid { grid-template-columns: 1fr 1fr; }
+}
+.site-footer .brand img { height: 34px; margin-bottom: var(--space-3); }
+.site-footer p { color: color-mix(in srgb, var(--sand) 75%, transparent); max-width: 32ch; }
+.site-footer h4 { color: var(--sand); font-size: 0.85rem; letter-spacing: 0.04em; text-transform: uppercase; margin-bottom: var(--space-3); }
+.site-footer ul { list-style: none; margin: 0; padding: 0; }
+.site-footer li { margin-bottom: var(--space-2); }
+.site-footer a { color: color-mix(in srgb, var(--sand) 85%, transparent); text-decoration: none; font-size: 0.92rem; }
+.site-footer a:hover { color: var(--gold); }
+.footer-bottom {
+  border-top: 1px solid color-mix(in srgb, var(--sand) 20%, transparent);
+  padding-top: var(--space-5);
+  display: flex; flex-wrap: wrap; justify-content: space-between; gap: var(--space-3);
+  font-size: 0.82rem;
+  color: color-mix(in srgb, var(--sand) 65%, transparent);
+}

@@ -1,0 +1,176 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Contact — MATEX Dallas</title>
+  <meta name="description" content="Get in touch with MATEX Dallas.">
+  <link rel="canonical" href="https://matexdallas.org/contact.html">
+  <meta name="theme-color" content="#1B2A4A">
+
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="MATEX Dallas">
+  <meta property="og:title" content="Contact — MATEX Dallas">
+  <meta property="og:description" content="Get in touch with MATEX Dallas.">
+  <meta property="og:image" content="https://matexdallas.org/assets/images/logos/matex-logo-primary.png">
+  <meta property="og:url" content="https://matexdallas.org/contact.html">
+  <meta name="twitter:card" content="summary_large_image">
+
+  <link rel="icon" href="assets/images/logos/matex-favicon.png" type="image/png">
+  <link rel="apple-touch-icon" href="assets/images/logos/matex-favicon.png">
+  <link rel="preload" href="assets/fonts/public-sans-variable.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="assets/fonts/fraunces-variable.woff2" as="font" type="font/woff2" crossorigin>
+
+  <link rel="stylesheet" href="assets/css/variables.css">
+  <link rel="stylesheet" href="assets/css/base.css">
+  <link rel="stylesheet" href="assets/css/layout.css">
+  <link rel="stylesheet" href="assets/css/components.css">
+  <style>
+    .contact-grid { display: grid; grid-template-columns: 1fr 1.3fr; gap: var(--space-8); align-items: start; }
+    @media (max-width: 860px) { .contact-grid { grid-template-columns: 1fr; } }
+  </style>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "NGO",
+    "name": "MATEX Dallas",
+    "url": "https://matexdallas.org/contact.html",
+    "logo": "https://matexdallas.org/assets/images/logos/matex-logo-primary.png",
+    "description": "A nonprofit organization serving the Dallas Metroplex."
+  }
+  </script>
+</head>
+<body>
+  <a class="skip-link" href="#main-content">Skip to content</a>
+
+  <header class="site-header">
+    <div class="container">
+      <a class="brand" href="index.html" aria-label="MATEX Dallas — home">
+        <img src="assets/images/logos/matex-logo-horizontal.png" alt="MATEX Dallas — One Family" width="220" height="90">
+      </a>
+      <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="main-nav" aria-label="Toggle navigation menu">
+        <span class="bar"></span><span class="bar"></span><span class="bar"></span>
+      </button>
+      <nav class="main-nav" id="main-nav" aria-label="Primary">
+        <ul class="unstyled">
+          <li><a href="index.html">Home</a></li>
+          <li><a href="about.html">About</a></li>
+          <li><a href="programs.html">Programs</a></li>
+          <li><a href="leadership.html">Leadership</a></li>
+          <li><a href="events.html">Events</a></li>
+          <li><a href="gallery.html">Gallery</a></li>
+          <li><a href="membership.html">Membership</a></li>
+          <li><a href="contact.html" aria-current="page">Contact</a></li>
+        </ul>
+        <div class="nav-cta"><a href="donate.html" class="btn btn-donate">Donate</a></div>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main-content">
+
+    <section class="page-header">
+      <div class="container">
+        <span class="eyebrow">Get in Touch</span>
+        <h1>Contact</h1>
+        <p>Questions about membership, donations, or getting involved? Reach out.</p>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container">
+        <div class="needs-content" style="margin-bottom: var(--space-7);">
+          <strong>Contact details and form backend needed.</strong> The address, phone, and email below are placeholders. The form is fully styled and accessible but isn't wired to send anywhere yet — it needs either a confirmed contact email or a form service (e.g. Formspree, or a future backend) before it can go live.
+        </div>
+
+        <div class="contact-grid">
+          <div>
+            <h2>Reach Us</h2>
+            <ul class="info-list">
+              <li><span class="k">Address</span><span class="v">[Street address — to be provided]<br>Dallas, TX [ZIP — TBD]</span></li>
+              <li><span class="k">Phone</span><span class="v">[Phone number — to be provided]</span></li>
+              <li><span class="k">Email</span><span class="v">[Email address — to be provided]</span></li>
+              <li><span class="k">Social</span><span class="v">[Social media links — to be provided]</span></li>
+            </ul>
+          </div>
+
+          <div>
+            <h2>Send a Message</h2>
+            <form class="form-grid" action="#" method="post">
+              <div class="form-row">
+                <label for="name">Full name <span class="required-mark">*</span></label>
+                <input type="text" id="name" name="name" autocomplete="name" required>
+              </div>
+              <div class="form-row">
+                <label for="email">Email <span class="required-mark">*</span></label>
+                <input type="email" id="email" name="email" autocomplete="email" required>
+              </div>
+              <div class="form-row">
+                <label for="reason">What's this about?</label>
+                <select id="reason" name="reason">
+                  <option value="">Select one</option>
+                  <option value="membership">Membership</option>
+                  <option value="donation">Donation</option>
+                  <option value="volunteering">Volunteering</option>
+                  <option value="general">General question</option>
+                </select>
+              </div>
+              <div class="form-row">
+                <label for="message">Message <span class="required-mark">*</span></label>
+                <textarea id="message" name="message" required></textarea>
+              </div>
+              <div>
+                <button type="submit" class="btn btn-primary">Send Message</button>
+                <p class="hint" style="margin-top:8px;">This form isn't connected yet — see the note above.</p>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="brand-col">
+          <div class="brand"><img src="assets/images/logos/matex-logo-white.png" alt="MATEX Dallas — One Family" width="180" height="70" loading="lazy" decoding="async"></div>
+          <p>A nonprofit organization serving the Dallas Metroplex.</p>
+        </div>
+        <div>
+          <h4>Explore</h4>
+          <ul>
+            <li><a href="about.html">About</a></li>
+            <li><a href="programs.html">Programs</a></li>
+            <li><a href="events.html">Events</a></li>
+            <li><a href="gallery.html">Gallery</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4>Get Involved</h4>
+          <ul>
+            <li><a href="membership.html">Membership</a></li>
+            <li><a href="donate.html">Donate</a></li>
+            <li><a href="leadership.html">Leadership</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4>Contact</h4>
+          <ul>
+            <li>[Address — to be provided]</li>
+            <li>[Phone — to be provided]</li>
+            <li><a href="contact.html">Contact form</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>© <span data-current-year>2026</span> MATEX Dallas. All rights reserved.</span>
+        <span>matexdallas.org</span>
+      </div>
+    </div>
+  </footer>
+
+  <script src="assets/js/main.js" defer></script>
+</body>
+</html>

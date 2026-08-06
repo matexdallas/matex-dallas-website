@@ -1,0 +1,49 @@
+/* ==========================================================================
+   MATEX Dallas — Design Tokens
+   Colors pulled from the existing logo (navy lettering, Texas-flag red,
+   the sunset gradient across the Africa silhouette). Change values here —
+   never hard-code hex/px elsewhere — to keep the whole site in sync.
+   ========================================================================== */
+
+:root {
+  /* Color */
+  --navy: #1B2A4A;
+  --navy-dark: #142038;
+  --red: #A6332B;
+  --red-dark: #872922;
+  --gold: #D98A2E;
+  --sand: #F6F1E7;
+  --bg: var(--sand);
+  --bg-raised: #FFFFFF;
+  --ink: #201D19;
+  --muted: #6E6350; /* darkened from #7A6F5A: original failed WCAG AA (4.39:1) on the sand page background */
+  --line: #E2D8C3;
+  --focus-ring: var(--red);
+
+  /* Type */
+  --font-display: "Fraunces", Georgia, "Iowan Old Style", "Palatino Linotype", serif;
+  --font-body: "Public Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+
+  /* Spacing scale (used for gap/padding/margin so rhythm stays consistent) */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+  --space-8: 64px;
+  --space-9: 96px;
+
+  /* Radius */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-pill: 999px;
+
+  /* Layout */
+  --container: 1180px;
+  --container-narrow: 760px;
+
+  /* Motion */
+  --ease: cubic-bezier(0.4, 0, 0.2, 1);
+}

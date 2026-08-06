@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" role="img" aria-label="Placeholder: officer headshot needed">
+  <rect width="400" height="400" fill="#F6F1E7"/>
+  <circle cx="200" cy="160" r="70" fill="#E2D8C3"/>
+  <path d="M70 380 C70 280 130 240 200 240 C270 240 330 280 330 380 Z" fill="#E2D8C3"/>
+  <text x="200" y="360" text-anchor="middle" font-family="Arial, sans-serif" font-size="17" fill="#7A6F5A">Headshot Needed</text>
+</svg>
