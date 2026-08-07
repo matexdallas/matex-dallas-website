@@ -87,11 +87,15 @@
 .section-head.center { margin-inline: auto; text-align: center; }
 .section--tight { padding-block: var(--space-7); }
 .section--raised { background: var(--bg-raised); }
+.section--flush-top { padding-top: var(--space-5); } /* used right after the hero, where a full section-top gap reads as empty space */
 
 /* ---------- Grids ---------- */
 .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-5); }
 .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--space-5); }
 .grid-5 { display: grid; grid-template-columns: repeat(5, 1fr); gap: var(--space-4); }
+/* Without this, a long unbroken word (e.g. "Collaborative" in a stat tile) forces
+   its 1fr track to its min-content width instead of wrapping, blowing out the grid. */
+.grid-3 > *, .grid-4 > *, .grid-5 > * { min-width: 0; }
 @media (max-width: 860px) {
   .grid-3, .grid-4 { grid-template-columns: repeat(2, 1fr); }
   .grid-5 { grid-template-columns: repeat(3, 1fr); }
@@ -106,7 +110,10 @@
   position: absolute; inset: 0;
   z-index: 0;
 }
-.hero .bg img { width: 100%; height: 100%; object-fit: cover; }
+.hero .bg img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 22%; }
+@media (max-width: 640px) {
+  .hero .bg img { object-position: 50% 14%; } /* narrower crop on mobile — bias higher so the group isn't cut off */
+}
 .hero .bg::after {
   content: "";
   position: absolute; inset: 0;
