@@ -108,6 +108,7 @@
    single column on phones — headshot + name + title reads cramped at 2-up
    on a narrow screen in a way that photo-less content tiles don't. */
 .leadership-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-6) var(--space-5); }
+.leadership-grid > * { min-width: 0; }
 @media (max-width: 860px) {
   .leadership-grid { grid-template-columns: repeat(2, 1fr); }
 }
