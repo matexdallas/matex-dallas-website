@@ -104,6 +104,17 @@
   .grid-3, .grid-4, .grid-5 { grid-template-columns: 1fr 1fr; }
 }
 
+/* Leadership administration grid: unlike .grid-3 above, this drops to a
+   single column on phones — headshot + name + title reads cramped at 2-up
+   on a narrow screen in a way that photo-less content tiles don't. */
+.leadership-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-6) var(--space-5); }
+@media (max-width: 860px) {
+  .leadership-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 560px) {
+  .leadership-grid { grid-template-columns: 1fr; }
+}
+
 /* ---------- Hero ---------- */
 .hero { position: relative; padding-block: var(--space-9) var(--space-8); overflow: hidden; }
 .hero .bg {
