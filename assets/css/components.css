@@ -81,6 +81,12 @@
 .leader-card .name { font-weight: 700; font-size: 0.98rem; margin-bottom: 2px; }
 .leader-card .role { font-size: 0.82rem; color: var(--muted); }
 
+/* Additional officers under the Home page's President spotlight, and the
+   About page's leadership preview grid — short previews only, never the
+   full roster (that lives on leadership.html). */
+.leadership-more { margin-top: var(--space-7); }
+.leadership-cta { text-align: center; margin-top: var(--space-7); }
+
 /* Portrait variant (Leadership page admin grid) — 4:5 rounded-rectangle
    photos instead of the circular crop above. Scoped to this modifier so
    About's existing circular officer cards are untouched. */
