@@ -79,24 +79,21 @@
 
     <section class="section">
       <div class="container">
-        <div class="needs-content" style="margin-bottom: var(--space-7);">
-          <strong>Contact details and form backend needed.</strong> The address, phone, and email below are placeholders. The form is fully styled and accessible but isn't wired to send anywhere yet — it needs either a confirmed contact email or a form service (e.g. Formspree, or a future backend) before it can go live.
-        </div>
-
         <div class="contact-grid">
           <div>
             <h2>Reach Us</h2>
             <ul class="info-list">
-              <li><span class="k">Address</span><span class="v">[Street address — to be provided]<br>Dallas, TX [ZIP — TBD]</span></li>
-              <li><span class="k">Phone</span><span class="v">[Phone number — to be provided]</span></li>
-              <li><span class="k">Email</span><span class="v">[Email address — to be provided]</span></li>
-              <li><span class="k">Social</span><span class="v">[Social media links — to be provided]</span></li>
+              <li><span class="k">Location</span><span class="v">Rockwall, Texas</span></li>
+              <li><span class="k">Email</span><span class="v"><a href="mailto:matexdallas@gmail.com">matexdallas@gmail.com</a></span></li>
             </ul>
           </div>
 
           <div>
             <h2>Send a Message</h2>
-            <form class="form-grid" action="#" method="post">
+            <!-- Backend not yet configured: submissions should route to matexdallas@gmail.com once
+                 wired up (e.g. a form service or a small backend). Until then, keep this inert —
+                 don't set a real action/method that would appear to send without actually doing so. -->
+            <form class="form-grid" onsubmit="event.preventDefault();">
               <div class="form-row">
                 <label for="name">Full name <span class="required-mark">*</span></label>
                 <input type="text" id="name" name="name" autocomplete="name" required>
@@ -121,7 +118,6 @@
               </div>
               <div>
                 <button type="submit" class="btn btn-primary">Send Message</button>
-                <p class="hint" style="margin-top:8px;">This form isn't connected yet — see the note above.</p>
               </div>
             </form>
           </div>
@@ -161,8 +157,8 @@
         <div>
           <h4>Contact</h4>
           <ul>
-            <li>[Address — to be provided]</li>
-            <li>[Phone — to be provided]</li>
+            <li>Rockwall, Texas</li>
+            <li><a href="mailto:matexdallas@gmail.com">matexdallas@gmail.com</a></li>
             <li><a href="contact.html">Contact form</a></li>
           </ul>
         </div>
