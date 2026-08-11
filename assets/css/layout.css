@@ -90,17 +90,19 @@
 .section--flush-top { padding-top: var(--space-5); } /* used right after the hero, where a full section-top gap reads as empty space */
 
 /* ---------- Grids ---------- */
+.grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--space-5); }
 .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-5); }
 .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--space-5); }
 .grid-5 { display: grid; grid-template-columns: repeat(5, 1fr); gap: var(--space-4); }
 /* Without this, a long unbroken word (e.g. "Collaborative" in a stat tile) forces
    its 1fr track to its min-content width instead of wrapping, blowing out the grid. */
-.grid-3 > *, .grid-4 > *, .grid-5 > * { min-width: 0; }
+.grid-2 > *, .grid-3 > *, .grid-4 > *, .grid-5 > * { min-width: 0; }
 @media (max-width: 860px) {
   .grid-3, .grid-4 { grid-template-columns: repeat(2, 1fr); }
   .grid-5 { grid-template-columns: repeat(3, 1fr); }
 }
 @media (max-width: 560px) {
+  .grid-2 { grid-template-columns: 1fr; }
   .grid-3, .grid-4, .grid-5 { grid-template-columns: 1fr 1fr; }
 }
 
