@@ -426,6 +426,7 @@
   padding: 10px 22px;
   border-radius: var(--radius-pill);
 }
+.paypal-button-frame { width: 100%; max-width: 260px; }
 .payment-recipient { margin: 0; font-size: 0.9rem; color: var(--ink); }
 .payment-recipient strong { color: var(--navy); }
 .payment-note { margin: 0; font-size: 0.85rem; color: var(--muted); max-width: 38ch; }

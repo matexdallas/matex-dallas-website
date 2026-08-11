@@ -85,7 +85,8 @@
             </div>
             <span class="payment-label">Donate with PayPal</span>
             <p class="payment-recipient">Recipient: <strong>MATEX DALLAS, INC.</strong></p>
-            <p class="payment-note">Scan the QR code to make a secure donation through PayPal.</p>
+            <p class="payment-note">Scan the QR code, or use the button below, to make a secure donation through PayPal.</p>
+            <div id="paypal-container-FWWLS2WAJ8QT8" class="paypal-button-frame"></div>
           </div>
 
           <div class="payment-card">
@@ -95,6 +96,7 @@
               <img src="assets/images/payments/zelle-qr.png" alt="QR code to donate to MATEX DALLAS, INC. via Zelle" width="1050" height="996" loading="lazy" decoding="async">
             </div>
             <p class="payment-recipient">Recipient: <strong>MATEX DALLAS, INC.</strong></p>
+            <p class="payment-note">Zelle email: <a href="mailto:matexdallas@gmail.com">matexdallas@gmail.com</a></p>
             <p class="payment-note payment-note--verify">Before sending your donation, confirm that your banking app displays MATEX DALLAS, INC. as the recipient.</p>
           </div>
 
@@ -156,5 +158,11 @@
   </footer>
 
   <script src="assets/js/main.js" defer></script>
+  <script src="https://www.paypal.com/sdk/js?client-id=BAAVdB5dDQqBPDaJT5WD8BXmW-rG87i3RW6rN9cas4d64wvqCz18HjaypsxbBgjom67vznNY7S_rR_rf1Q&components=hosted-buttons&enable-funding=venmo&currency=USD"></script>
+  <script>
+    paypal.HostedButtons({
+      hostedButtonId: "FWWLS2WAJ8QT8",
+    }).render("#paypal-container-FWWLS2WAJ8QT8");
+  </script>
 </body>
 </html>
