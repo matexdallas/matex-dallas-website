@@ -138,6 +138,18 @@
 }
 .needs-content strong { color: var(--ink); }
 
+/* ---------- Value chips (About — Our Mission) ---------- */
+.values-row { display: flex; flex-wrap: wrap; gap: var(--space-3); margin-top: var(--space-5); }
+.value-chip {
+  display: inline-block;
+  background: var(--navy);
+  color: #FFFFFF;
+  font-weight: 700;
+  font-size: 0.85rem;
+  padding: 8px 20px;
+  border-radius: var(--radius-pill);
+}
+
 /* ---------- Founding badge (About — Our Story) ---------- */
 .founded-badge {
   display: flex;
