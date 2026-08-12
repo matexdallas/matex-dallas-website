@@ -190,10 +190,33 @@
 .tier-card .tier-name { font-family: var(--font-display); font-size: 1.3rem; color: var(--navy); }
 .tier-card .tier-price { font-size: 1.6rem; font-weight: 700; color: var(--ink); }
 .tier-card .tier-price small { font-size: 0.7rem; font-weight: 500; color: var(--muted); }
+.tier-card .tier-breakdown { margin: calc(var(--space-3) * -1) 0 0; font-size: 0.85rem; color: var(--muted); }
 .tier-card ul { list-style: none; margin: 0; padding: 0; font-size: 0.9rem; color: var(--muted); display: flex; flex-direction: column; gap: 8px; }
 .tier-card ul li { padding-left: 22px; position: relative; }
 .tier-card ul li::before { content: "✓"; position: absolute; left: 0; color: var(--navy); font-weight: 700; }
 .tier-card .btn { margin-top: auto; align-self: flex-start; }
+.tier-card .payment-note { max-width: none; }
+
+/* ---------- Notice callout (Membership — payment dues note) ---------- */
+.notice-box {
+  border: 1.5px solid var(--line);
+  border-left: 4px solid var(--navy);
+  border-radius: var(--radius-md);
+  padding: var(--space-5) var(--space-6);
+  background: var(--bg-raised);
+  color: var(--ink);
+  font-size: 0.95rem;
+  margin-bottom: var(--space-6);
+}
+.pull-statement {
+  text-align: center;
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  font-style: italic;
+  color: var(--navy);
+  margin-top: var(--space-5);
+  margin-bottom: 0;
+}
 
 /* ---------- Numbered step list (How to Join / How to Donate) ---------- */
 .steps { counter-reset: step; display: grid; gap: var(--space-5); }
