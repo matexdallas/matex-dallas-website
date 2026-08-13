@@ -10,9 +10,11 @@
  *      admins full read/update on this table) and try to match each
  *      one to a members row by member_number, so the admin can
  *      approve (link + mark approved) or deny in one click.
- *   4. Also load the full members list (RLS grants admins full read)
- *      for browsing/search. Read-only — no editing here yet; that's
- *      reserved for a future "membership status" build.
+ *   4. Also load the full members list (RLS grants admins full read
+ *      and update) for browsing/search, with inline editing of names
+ *      only (first/middle/last). Other fields — status, contact info,
+ *      dues — are still read-only here, reserved for a future
+ *      "membership status" build.
  *
  * Requires assets/js/supabase-config.js to run first.
  */
@@ -28,6 +30,7 @@
   var sb = window.matexSupabase;
   var currentUser = null;
   var allMembers = [];
+  var editingMemberId = null;
 
   var states = {
     loading: document.getElementById("state-loading"),
@@ -61,19 +64,45 @@
   // ---------------------------------------------------------------
   // Members table
   // ---------------------------------------------------------------
+  function nameCellHtml(m) {
+    if (m.id !== editingMemberId) {
+      return escapeHtml(fullName(m));
+    }
+    return (
+      '<div class="name-edit">' +
+      '<input type="text" data-field="first_name" placeholder="First" value="' + escapeHtml(m.first_name) + '">' +
+      '<input type="text" data-field="middle_name" placeholder="Middle" value="' + escapeHtml(m.middle_name) + '">' +
+      '<input type="text" data-field="last_name" placeholder="Last" value="' + escapeHtml(m.last_name) + '">' +
+      "</div>"
+    );
+  }
+
+  function actionsCellHtml(m) {
+    if (m.id !== editingMemberId) {
+      return '<button type="button" class="btn btn-outline-navy btn-sm" data-action="edit-name">Edit</button>';
+    }
+    return (
+      '<div class="row-actions">' +
+      '<button type="button" class="btn btn-primary btn-sm" data-action="save-name">Save</button>' +
+      '<button type="button" class="btn btn-deny btn-sm" data-action="cancel-name">Cancel</button>' +
+      "</div>"
+    );
+  }
+
   function renderMembers(members) {
     var tbody = document.getElementById("members-tbody");
     tbody.innerHTML = members
       .map(function (m) {
         return (
-          "<tr>" +
+          '<tr data-member-id="' + m.id + '">' +
           "<td>" + escapeHtml(m.member_number) + "</td>" +
-          "<td>" + escapeHtml(fullName(m)) + "</td>" +
+          "<td>" + nameCellHtml(m) + "</td>" +
           "<td>" + escapeHtml(m.email) + "</td>" +
           "<td>" + escapeHtml(m.phone) + "</td>" +
           "<td>" + escapeHtml(m.status) + "</td>" +
           "<td>" + escapeHtml(m.joined_date) + "</td>" +
           "<td>" + (m.auth_user_id ? "Yes" : "&mdash;") + "</td>" +
+          "<td>" + actionsCellHtml(m) + "</td>" +
           "</tr>"
         );
       })
@@ -94,6 +123,59 @@
         renderMembers(allMembers);
       });
   }
+
+  document.getElementById("members-tbody").addEventListener("click", function (event) {
+    var btn = event.target.closest("button[data-action]");
+    if (!btn) return;
+    var row = btn.closest("tr");
+    var memberId = row.getAttribute("data-member-id");
+    var action = btn.getAttribute("data-action");
+
+    if (action === "edit-name") {
+      editingMemberId = memberId;
+      renderMembers(allMembers);
+      return;
+    }
+
+    if (action === "cancel-name") {
+      editingMemberId = null;
+      renderMembers(allMembers);
+      return;
+    }
+
+    if (action === "save-name") {
+      var inputs = row.querySelectorAll(".name-edit input");
+      var updates = {};
+      inputs.forEach(function (input) {
+        updates[input.getAttribute("data-field")] = input.value.trim() || null;
+      });
+      if (!updates.first_name || !updates.last_name) {
+        return; // first/last are required — leave the fields open for correction
+      }
+
+      btn.disabled = true;
+      btn.textContent = "Saving…";
+
+      sb.from("members")
+        .update(updates)
+        .eq("id", memberId)
+        .then(function (res) {
+          if (res.error) {
+            console.error("[MATEX Supabase] members name update error:", res.error.message);
+            btn.disabled = false;
+            btn.textContent = "Save";
+            return;
+          }
+          editingMemberId = null;
+          return loadMembers();
+        })
+        .catch(function (err) {
+          console.error("[MATEX Supabase] members name update threw:", err);
+          btn.disabled = false;
+          btn.textContent = "Save";
+        });
+    }
+  });
 
   document.getElementById("member-search").addEventListener("input", function (event) {
     var q = event.target.value.trim().toLowerCase();
