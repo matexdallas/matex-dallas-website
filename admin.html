@@ -112,6 +112,27 @@
         <div class="admin-state" id="state-admin" hidden>
 
           <div class="admin-section">
+            <h2>Contact Messages</h2>
+            <div id="contact-empty" class="admin-empty" hidden>No messages.</div>
+            <div class="admin-table-wrap" id="contact-table-wrap" hidden>
+              <table class="admin-table">
+                <thead>
+                  <tr>
+                    <th>Received</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Reason</th>
+                    <th>Message</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="contact-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="admin-section">
             <h2>New Member Applications</h2>
             <div id="applications-empty" class="admin-empty" hidden>No pending applications.</div>
             <div class="admin-table-wrap" id="applications-table-wrap" hidden>

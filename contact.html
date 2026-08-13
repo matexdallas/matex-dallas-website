@@ -28,6 +28,16 @@
   <style>
     .contact-grid { display: grid; grid-template-columns: 1fr 1.3fr; gap: var(--space-8); align-items: start; }
     @media (max-width: 860px) { .contact-grid { grid-template-columns: 1fr; } }
+    .contact-result {
+      margin-top: var(--space-5);
+      padding: var(--space-4) var(--space-5);
+      border: 1.5px solid var(--line);
+      border-left: 4px solid var(--navy);
+      border-radius: var(--radius-md);
+      background: var(--bg-raised);
+      font-size: 0.95rem;
+    }
+    .contact-result[data-state="error"] { border-left-color: var(--red); }
   </style>
   <script type="application/ld+json">
   {
@@ -90,10 +100,7 @@
 
           <div>
             <h2>Send a Message</h2>
-            <!-- Backend not yet configured: submissions should route to matexdallas@gmail.com once
-                 wired up (e.g. a form service or a small backend). Until then, keep this inert —
-                 don't set a real action/method that would appear to send without actually doing so. -->
-            <form class="form-grid" onsubmit="event.preventDefault();">
+            <form class="form-grid" id="contact-form" novalidate>
               <div class="form-row">
                 <label for="name">Full name <span class="required-mark">*</span></label>
                 <input type="text" id="name" name="name" autocomplete="name" required>
@@ -120,6 +127,7 @@
                 <button type="submit" class="btn btn-primary">Send Message</button>
               </div>
             </form>
+            <div class="contact-result" id="contact-result" role="status" aria-live="polite" hidden></div>
           </div>
         </div>
       </div>
@@ -169,6 +177,9 @@
     </div>
   </footer>
 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="assets/js/supabase-config.js"></script>
+  <script src="assets/js/contact.js"></script>
   <script src="assets/js/main.js" defer></script>
 </body>
 </html>
