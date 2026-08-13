@@ -49,6 +49,25 @@
     }
     .approve-edit input { width: 130px; }
     .row-actions { display: flex; gap: 6px; flex-wrap: wrap; }
+    .form-2col { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-4); }
+    @media (max-width: 560px) { .form-2col { grid-template-columns: 1fr; } }
+    .dues-summary { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; white-space: nowrap; }
+    .dues-balance-ok { color: #1a7f37; font-weight: 700; }
+    .dues-balance-due { color: var(--red); font-weight: 700; }
+    .dues-panel { background: var(--bg); padding: var(--space-5); }
+    .dues-history-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; margin-bottom: var(--space-4); }
+    .dues-history-table th, .dues-history-table td { text-align: left; padding: 6px 10px; border-bottom: 1px solid var(--line); }
+    .dues-add-form { display: flex; gap: 8px; flex-wrap: wrap; align-items: flex-end; }
+    .dues-add-form .form-row { margin-bottom: 0; }
+    .dues-add-form input, .dues-add-form select {
+      font-family: var(--font-body);
+      font-size: 0.85rem;
+      padding: 7px 9px;
+      border: 1.5px solid var(--line);
+      border-radius: var(--radius-sm);
+      background: var(--bg-raised);
+      color: var(--ink);
+    }
   </style>
 </head>
 <body>
@@ -191,6 +210,14 @@
                   <input type="text" id="am-status" name="status" value="active">
                 </div>
               </div>
+              <div class="form-row">
+                <label for="am-membership-type">Membership type</label>
+                <select id="am-membership-type" name="membership_type">
+                  <option value="">Not set</option>
+                  <option value="single">Single — $85/year</option>
+                  <option value="couple">Couple — $170/year</option>
+                </select>
+              </div>
               <div class="form-2col">
                 <div class="form-row">
                   <label for="am-first-name">First name <span class="required-mark">*</span></label>
@@ -260,6 +287,7 @@
                     <th>Email</th>
                     <th>Phone</th>
                     <th>Status</th>
+                    <th>Dues (<span id="dues-year-label"></span>)</th>
                     <th>Joined</th>
                     <th>Linked</th>
                     <th>Actions</th>
