@@ -153,6 +153,7 @@
       sb.from("portal_access_requests")
         .insert({
           user_id: user.id,
+          requester_email: user.email || null,
           claimed_full_name: requestForm.full_name.value.trim(),
           claimed_member_number: requestForm.member_number.value.trim(),
           claimed_phone_last4: requestForm.phone_last4.value.trim() || null

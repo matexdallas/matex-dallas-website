@@ -3,5 +3,6 @@ Allow: /
 Disallow: /supabase-test.html
 Disallow: /portal-login.html
 Disallow: /portal.html
+Disallow: /admin.html
 
 Sitemap: https://matexdallas.org/sitemap.xml
