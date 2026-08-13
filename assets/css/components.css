@@ -284,11 +284,30 @@
   width: 40px; height: 40px; border-radius: 50%; cursor: pointer; font-size: 1.1rem;
 }
 .lightbox .lb-close:hover { background: rgba(255,255,255,0.12); }
+.lightbox .lb-nav {
+  position: absolute; top: 50%; transform: translateY(-50%);
+  background: none; border: 1.5px solid rgba(255,255,255,0.5); color: #fff;
+  width: 44px; height: 44px; border-radius: 50%; cursor: pointer; font-size: 1.6rem; line-height: 1;
+  display: flex; align-items: center; justify-content: center;
+}
+.lightbox .lb-nav:hover { background: rgba(255,255,255,0.12); }
+.lightbox .lb-prev { left: var(--space-5); }
+.lightbox .lb-next { right: var(--space-5); }
+.lightbox .lb-counter { color: color-mix(in srgb, var(--sand) 65%, transparent); text-align: center; font-size: 0.78rem; margin: 4px 0 0; }
+@media (max-width: 640px) {
+  .lightbox .lb-nav { width: 36px; height: 36px; font-size: 1.3rem; }
+  .lightbox .lb-prev { left: var(--space-2); }
+  .lightbox .lb-next { right: var(--space-2); }
+}
 .filter-gallery { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--space-4); }
 .filter-gallery button.thumb { border: none; padding: 0; background: none; cursor: pointer; border-radius: var(--radius-sm); overflow: hidden; aspect-ratio: 1; }
 .filter-gallery button.thumb img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.25s var(--ease); }
 .filter-gallery button.thumb:hover img { transform: scale(1.06); }
+/* Tuned for this grid specifically (4 → 3 → 2 → 1) rather than the site's usual
+   860/560 grid breakpoints, which only ever step down to 2 columns. */
+@media (max-width: 1000px) { .filter-gallery { grid-template-columns: repeat(3, 1fr); } }
 @media (max-width: 760px) { .filter-gallery { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 420px) { .filter-gallery { grid-template-columns: 1fr; } }
 
 /* ---------- Closing CTA band (used near the bottom of interior pages) ---------- */
 .cta-band {
