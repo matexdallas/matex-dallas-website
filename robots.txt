@@ -1,5 +1,7 @@
 User-agent: *
 Allow: /
 Disallow: /supabase-test.html
+Disallow: /portal-login.html
+Disallow: /portal.html
 
 Sitemap: https://matexdallas.org/sitemap.xml
