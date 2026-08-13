@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Member Portal — MATEX Dallas</title>
+  <meta name="description" content="MATEX Dallas member portal.">
+  <link rel="canonical" href="https://matexdallas.org/portal.html">
+  <meta name="theme-color" content="#1B2A4A">
+  <meta name="robots" content="noindex, nofollow">
+
+  <link rel="icon" href="assets/images/logos/matex-favicon.png" type="image/png">
+  <link rel="apple-touch-icon" href="assets/images/logos/matex-favicon.png">
+  <link rel="preload" href="assets/fonts/public-sans-variable.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="assets/fonts/fraunces-variable.woff2" as="font" type="font/woff2" crossorigin>
+
+  <link rel="stylesheet" href="assets/css/variables.css">
+  <link rel="stylesheet" href="assets/css/base.css">
+  <link rel="stylesheet" href="assets/css/layout.css">
+  <link rel="stylesheet" href="assets/css/components.css">
+  <style>
+    .portal-state[hidden] { display: none; }
+    .portal-topbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-5); flex-wrap: wrap; gap: var(--space-3); }
+    .portal-status-message {
+      padding: var(--space-4) var(--space-5);
+      border: 1.5px solid var(--line);
+      border-left: 4px solid var(--navy);
+      border-radius: var(--radius-md);
+      background: var(--bg-raised);
+      font-size: 0.95rem;
+      margin-bottom: var(--space-5);
+    }
+    .portal-status-message[data-state="pending"] { border-left-color: #A67C00; }
+    .portal-status-message[data-state="denied"],
+    .portal-status-message[data-state="error"] { border-left-color: var(--red); }
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#main-content">Skip to content</a>
+
+  <header class="site-header">
+    <div class="container">
+      <a class="brand" href="index.html" aria-label="MATEX Dallas — home">
+        <img src="assets/images/logos/matex-logo-horizontal.png" alt="MATEX Dallas — One Family" width="220" height="90">
+      </a>
+      <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="main-nav" aria-label="Toggle navigation menu">
+        <span class="bar"></span><span class="bar"></span><span class="bar"></span>
+      </button>
+      <nav class="main-nav" id="main-nav" aria-label="Primary">
+        <ul class="unstyled">
+          <li><a href="index.html">Home</a></li>
+          <li><a href="about.html">About</a></li>
+          <li><a href="programs.html">Programs</a></li>
+          <li><a href="leadership.html">Leadership</a></li>
+          <li><a href="events.html">Events</a></li>
+          <li><a href="gallery.html">Gallery</a></li>
+          <li><a href="membership.html">Membership</a></li>
+          <li><a href="contact.html">Contact</a></li>
+        </ul>
+        <div class="nav-cta"><a href="donate.html" class="btn btn-donate">Donate</a></div>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main-content">
+
+    <section class="page-header">
+      <div class="container">
+        <span class="eyebrow">Members</span>
+        <h1>Member Portal</h1>
+        <p>Your membership details, in one place.</p>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container-narrow">
+        <div class="portal-topbar">
+          <span id="portal-email" style="color: var(--muted); font-size: 0.9rem;"></span>
+          <button type="button" class="btn btn-outline-navy" id="sign-out-btn">Sign Out</button>
+        </div>
+
+        <!-- Loading -->
+        <div class="portal-state" id="state-loading">
+          <p>Loading your account…</p>
+        </div>
+
+        <!-- Not signed in (shouldn't normally be seen — redirects instead) -->
+        <div class="portal-state" id="state-signed-out" hidden>
+          <p>You're not signed in. <a href="portal-login.html">Go to login</a>.</p>
+        </div>
+
+        <!-- Signed in, no member link yet, no request on file -->
+        <div class="portal-state" id="state-request-access" hidden>
+          <div class="notice-box">
+            We couldn't find a linked membership record for your account yet. Submit the details below and
+            we'll manually match and approve your access — this keeps membership records private until we
+            can confirm it's really you.
+          </div>
+          <form class="form-grid" id="access-request-form" novalidate>
+            <div class="form-row">
+              <label for="req-name">Full name on your membership <span class="required-mark">*</span></label>
+              <input type="text" id="req-name" name="full_name" autocomplete="name" required>
+            </div>
+            <div class="form-row">
+              <label for="req-member-number">Member number <span class="required-mark">*</span></label>
+              <input type="text" id="req-member-number" name="member_number" autocomplete="off" required>
+              <span class="hint">Found on your membership card or welcome email.</span>
+            </div>
+            <div class="form-row">
+              <label for="req-phone">Last 4 digits of phone on file</label>
+              <input type="text" id="req-phone" name="phone_last4" autocomplete="off" maxlength="4" pattern="[0-9]{4}">
+              <span class="hint">Optional, but helps us match your record faster.</span>
+            </div>
+            <div>
+              <button type="submit" class="btn btn-primary">Request Access</button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Signed in, request already submitted -->
+        <div class="portal-state" id="state-request-status" hidden>
+          <div class="portal-status-message" id="request-status-message"></div>
+        </div>
+
+        <!-- Signed in and linked/approved -->
+        <div class="portal-state" id="state-profile" hidden>
+          <ul class="info-list" id="profile-list"></ul>
+        </div>
+
+        <!-- Generic error -->
+        <div class="portal-state" id="state-error" hidden>
+          <div class="portal-status-message" data-state="error">
+            Something went wrong loading your account. Please refresh, or contact us if it keeps happening.
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="brand-col">
+          <div class="brand"><img src="assets/images/logos/matex-logo-horizontal-transparent.png" alt="MATEX Dallas — One Family" width="150" height="66" loading="lazy" decoding="async"></div>
+          <p style="margin-bottom:12px;"><strong style="display:block; color:var(--sand); font-family:var(--font-display); font-size:1.05rem;">MATEX Dallas, Inc.</strong><span style="font-size:0.85rem; opacity:0.85;">One Family</span></p>
+          <p>Strengthening community through unity, culture, education, and service in the Dallas&ndash;Fort Worth Metroplex.</p>
+        </div>
+        <div>
+          <h4>Quick Links</h4>
+          <ul>
+            <li><a href="about.html">About</a></li>
+            <li><a href="programs.html">Programs</a></li>
+            <li><a href="leadership.html">Leadership</a></li>
+            <li><a href="events.html">Events</a></li>
+            <li><a href="gallery.html">Gallery</a></li>
+            <li><a href="membership.html">Membership</a></li>
+            <li><a href="contact.html">Contact</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4>Support</h4>
+          <ul>
+            <li><a href="donate.html">Donate</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4>Contact</h4>
+          <ul>
+            <li>Rockwall, Texas</li>
+            <li><a href="mailto:matexdallas@gmail.com">matexdallas@gmail.com</a></li>
+            <li><a href="contact.html">Contact Us</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>© <span data-current-year>2026</span> MATEX Dallas. All rights reserved.</span>
+        <span>matexdallas.org</span>
+      </div>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="assets/js/supabase-config.js"></script>
+  <script src="assets/js/portal.js"></script>
+  <script src="assets/js/main.js" defer></script>
+</body>
+</html>
