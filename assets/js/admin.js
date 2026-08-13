@@ -18,9 +18,12 @@
  *      mark approved) or deny in one click.
  *   5. Also load the full members list (RLS grants admins full read,
  *      update, and insert) for browsing/search, with inline editing
- *      of names only (first/middle/last). Other fields — status,
- *      contact info, dues — are still read-only here, reserved for a
- *      future "membership status" build.
+ *      of names only (first/middle/last) and a manual "+ Add Member"
+ *      form for entering someone directly (not via a join.html
+ *      application) — status/contact/address are settable there since
+ *      the admin is entering them fresh, but bulk/ongoing status
+ *      changes to existing members are still reserved for a future
+ *      "membership status" build.
  *
  * Requires assets/js/supabase-config.js to run first.
  */
@@ -198,6 +201,92 @@
         );
       })
     );
+  });
+
+  // ---------------------------------------------------------------
+  // Add member (manual entry, not via a join.html application)
+  // ---------------------------------------------------------------
+  var addMemberToggle = document.getElementById("add-member-toggle");
+  var addMemberForm = document.getElementById("add-member-form");
+  var addMemberCancel = document.getElementById("add-member-cancel");
+  var addMemberMessage = document.getElementById("add-member-message");
+
+  function openAddMemberForm() {
+    addMemberForm.hidden = false;
+    addMemberToggle.hidden = true;
+    addMemberMessage.hidden = true;
+    if (!addMemberForm.member_number.value) {
+      addMemberForm.member_number.value = suggestNextMemberNumber();
+    }
+    if (!addMemberForm.joined_date.value) {
+      addMemberForm.joined_date.value = new Date().toISOString().slice(0, 10);
+    }
+  }
+
+  function closeAddMemberForm() {
+    addMemberForm.hidden = true;
+    addMemberToggle.hidden = false;
+    addMemberForm.reset();
+    addMemberMessage.hidden = true;
+  }
+
+  addMemberToggle.addEventListener("click", openAddMemberForm);
+  addMemberCancel.addEventListener("click", closeAddMemberForm);
+
+  addMemberForm.addEventListener("submit", function (event) {
+    event.preventDefault();
+
+    function val(name) {
+      var v = addMemberForm[name].value.trim();
+      return v || null;
+    }
+
+    if (!val("member_number") || !val("first_name") || !val("last_name")) {
+      addMemberMessage.hidden = false;
+      addMemberMessage.textContent = "Member number, first name, and last name are required.";
+      return;
+    }
+
+    var submitBtn = addMemberForm.querySelector("button[type='submit']");
+    submitBtn.disabled = true;
+    submitBtn.textContent = "Adding…";
+    addMemberMessage.hidden = true;
+
+    sb.from("members")
+      .insert({
+        member_number: val("member_number"),
+        first_name: val("first_name"),
+        middle_name: val("middle_name"),
+        last_name: val("last_name"),
+        email: val("email"),
+        phone: val("phone"),
+        address_line1: val("address_line1"),
+        address_line2: val("address_line2"),
+        city: val("city"),
+        state: val("state"),
+        postal_code: val("postal_code"),
+        status: val("status") || "active",
+        joined_date: val("joined_date")
+      })
+      .then(function (res) {
+        if (res.error) {
+          console.error("[MATEX Supabase] add member error:", res.error.message);
+          addMemberMessage.hidden = false;
+          addMemberMessage.textContent = "Couldn't add that member — " + res.error.message;
+          return;
+        }
+        closeAddMemberForm();
+        return loadMembers();
+      })
+      .catch(function (err) {
+        console.error("[MATEX Supabase] add member threw:", err);
+        addMemberMessage.hidden = false;
+        addMemberMessage.textContent = "Something went wrong. Please try again.";
+      })
+      .finally(function () {
+        submitBtn.disabled = false;
+        submitBtn.textContent = "Add Member";
+      });
   });
 
   // ---------------------------------------------------------------
