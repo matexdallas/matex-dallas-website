@@ -82,6 +82,10 @@
 
 /* ---------- Section rhythm ---------- */
 .section { padding-block: var(--space-8); border-bottom: 1px solid var(--line); }
+/* In-page anchor targets (e.g. an Events page card linking to a specific
+   Gallery section) need breathing room under the sticky header so the
+   linked heading isn't hidden when the browser jumps to it. */
+.section[id] { scroll-margin-top: 90px; }
 .section:last-of-type { border-bottom: none; }
 .section-head { max-width: 60ch; margin-bottom: var(--space-6); }
 .section-head.center { margin-inline: auto; text-align: center; }
