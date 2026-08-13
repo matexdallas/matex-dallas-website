@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Apply for Membership — MATEX Dallas</title>
+  <meta name="description" content="Apply to become a MATEX Dallas member.">
+  <link rel="canonical" href="https://matexdallas.org/join.html">
+  <meta name="theme-color" content="#1B2A4A">
+
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="MATEX Dallas">
+  <meta property="og:title" content="Apply for Membership — MATEX Dallas">
+  <meta property="og:description" content="Apply to become a MATEX Dallas member.">
+  <meta property="og:image" content="https://matexdallas.org/assets/images/logos/matex-logo-primary.png">
+  <meta property="og:url" content="https://matexdallas.org/join.html">
+  <meta name="twitter:card" content="summary_large_image">
+
+  <link rel="icon" href="assets/images/logos/matex-favicon.png" type="image/png">
+  <link rel="apple-touch-icon" href="assets/images/logos/matex-favicon.png">
+  <link rel="preload" href="assets/fonts/public-sans-variable.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="assets/fonts/fraunces-variable.woff2" as="font" type="font/woff2" crossorigin>
+
+  <link rel="stylesheet" href="assets/css/variables.css">
+  <link rel="stylesheet" href="assets/css/base.css">
+  <link rel="stylesheet" href="assets/css/layout.css">
+  <link rel="stylesheet" href="assets/css/components.css">
+  <style>
+    .join-result {
+      margin-top: var(--space-5);
+      padding: var(--space-4) var(--space-5);
+      border: 1.5px solid var(--line);
+      border-left: 4px solid var(--navy);
+      border-radius: var(--radius-md);
+      background: var(--bg-raised);
+      font-size: 0.95rem;
+    }
+    .join-result[data-state="error"] { border-left-color: var(--red); }
+    .form-2col { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-4); }
+    @media (max-width: 560px) { .form-2col { grid-template-columns: 1fr; } }
+  </style>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "NGO",
+    "name": "MATEX Dallas",
+    "url": "https://matexdallas.org/join.html",
+    "logo": "https://matexdallas.org/assets/images/logos/matex-logo-primary.png",
+    "description": "A nonprofit organization serving the Dallas Metroplex."
+  }
+  </script>
+</head>
+<body>
+  <a class="skip-link" href="#main-content">Skip to content</a>
+
+  <header class="site-header">
+    <div class="container">
+      <a class="brand" href="index.html" aria-label="MATEX Dallas — home">
+        <img src="assets/images/logos/matex-logo-horizontal.png" alt="MATEX Dallas — One Family" width="220" height="90">
+      </a>
+      <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="main-nav" aria-label="Toggle navigation menu">
+        <span class="bar"></span><span class="bar"></span><span class="bar"></span>
+      </button>
+      <nav class="main-nav" id="main-nav" aria-label="Primary">
+        <ul class="unstyled">
+          <li><a href="index.html">Home</a></li>
+          <li><a href="about.html">About</a></li>
+          <li><a href="programs.html">Programs</a></li>
+          <li><a href="leadership.html">Leadership</a></li>
+          <li><a href="events.html">Events</a></li>
+          <li><a href="gallery.html">Gallery</a></li>
+          <li><a href="membership.html">Membership</a></li>
+          <li><a href="contact.html">Contact</a></li>
+        </ul>
+        <div class="nav-cta"><a href="donate.html" class="btn btn-donate">Donate</a></div>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main-content">
+
+    <section class="page-header">
+      <div class="container">
+        <span class="eyebrow">Get Involved</span>
+        <h1>Apply for Membership</h1>
+        <p>Tell us a bit about yourself and we'll follow up about joining MATEX Dallas.</p>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container-narrow">
+        <div class="notice-box">
+          Submitting this form does not create an account or charge any payment — it sends your information to
+          MATEX Dallas for review. We'll follow up by email or phone about next steps, including membership dues.
+        </div>
+
+        <form class="form-grid" id="join-form" novalidate>
+          <div class="form-2col">
+            <div class="form-row">
+              <label for="first_name">First name <span class="required-mark">*</span></label>
+              <input type="text" id="first_name" name="first_name" autocomplete="given-name" required>
+            </div>
+            <div class="form-row">
+              <label for="last_name">Last name <span class="required-mark">*</span></label>
+              <input type="text" id="last_name" name="last_name" autocomplete="family-name" required>
+            </div>
+          </div>
+          <div class="form-row">
+            <label for="middle_name">Middle name</label>
+            <input type="text" id="middle_name" name="middle_name" autocomplete="additional-name">
+          </div>
+          <div class="form-2col">
+            <div class="form-row">
+              <label for="email">Email <span class="required-mark">*</span></label>
+              <input type="email" id="email" name="email" autocomplete="email" required>
+            </div>
+            <div class="form-row">
+              <label for="phone">Phone</label>
+              <input type="tel" id="phone" name="phone" autocomplete="tel">
+            </div>
+          </div>
+          <div class="form-row">
+            <label for="address_line1">Address</label>
+            <input type="text" id="address_line1" name="address_line1" autocomplete="address-line1">
+          </div>
+          <div class="form-row">
+            <label for="address_line2">Address line 2</label>
+            <input type="text" id="address_line2" name="address_line2" autocomplete="address-line2">
+          </div>
+          <div class="form-2col">
+            <div class="form-row">
+              <label for="city">City</label>
+              <input type="text" id="city" name="city" autocomplete="address-level2">
+            </div>
+            <div class="form-row">
+              <label for="state">State</label>
+              <input type="text" id="state" name="state" autocomplete="address-level1">
+            </div>
+          </div>
+          <div class="form-row">
+            <label for="postal_code">ZIP code</label>
+            <input type="text" id="postal_code" name="postal_code" autocomplete="postal-code" style="max-width: 160px;">
+          </div>
+          <div class="form-row">
+            <label for="membership_type">Membership type</label>
+            <select id="membership_type" name="membership_type">
+              <option value="">Not sure yet</option>
+              <option value="single">Single — $85/year</option>
+              <option value="couple">Couple — $170/year</option>
+            </select>
+          </div>
+          <div class="form-row">
+            <label for="message">Anything else you'd like us to know?</label>
+            <textarea id="message" name="message"></textarea>
+          </div>
+          <div>
+            <button type="submit" class="btn btn-primary">Submit Application</button>
+          </div>
+        </form>
+
+        <div class="join-result" id="join-result" role="status" aria-live="polite" hidden></div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="brand-col">
+          <div class="brand"><img src="assets/images/logos/matex-logo-horizontal-transparent.png" alt="MATEX Dallas — One Family" width="150" height="66" loading="lazy" decoding="async"></div>
+          <p style="margin-bottom:12px;"><strong style="display:block; color:var(--sand); font-family:var(--font-display); font-size:1.05rem;">MATEX Dallas, Inc.</strong><span style="font-size:0.85rem; opacity:0.85;">One Family</span></p>
+          <p>Strengthening community through unity, culture, education, and service in the Dallas&ndash;Fort Worth Metroplex.</p>
+        </div>
+        <div>
+          <h4>Quick Links</h4>
+          <ul>
+            <li><a href="about.html">About</a></li>
+            <li><a href="programs.html">Programs</a></li>
+            <li><a href="leadership.html">Leadership</a></li>
+            <li><a href="events.html">Events</a></li>
+            <li><a href="gallery.html">Gallery</a></li>
+            <li><a href="membership.html">Membership</a></li>
+            <li><a href="contact.html">Contact</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4>Support</h4>
+          <ul>
+            <li><a href="donate.html">Donate</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4>Contact</h4>
+          <ul>
+            <li>Rockwall, Texas</li>
+            <li><a href="mailto:matexdallas@gmail.com">matexdallas@gmail.com</a></li>
+            <li><a href="contact.html">Contact Us</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>© <span data-current-year>2026</span> MATEX Dallas. All rights reserved.</span>
+        <span>matexdallas.org</span>
+      </div>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="assets/js/supabase-config.js"></script>
+  <script src="assets/js/join.js"></script>
+  <script src="assets/js/main.js" defer></script>
+</body>
+</html>

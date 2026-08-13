@@ -36,8 +36,8 @@
     .match-none { color: var(--red); font-weight: 700; }
     .admin-search { max-width: 340px; margin-bottom: var(--space-4); }
     .admin-empty { padding: var(--space-5); color: var(--muted); font-size: 0.9rem; }
-    .name-edit { display: flex; gap: 6px; flex-wrap: wrap; }
-    .name-edit input {
+    .name-edit, .approve-edit { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+    .name-edit input, .approve-edit input {
       font-family: var(--font-body);
       font-size: 0.85rem;
       padding: 6px 8px;
@@ -47,6 +47,7 @@
       color: var(--ink);
       width: 100px;
     }
+    .approve-edit input { width: 130px; }
     .row-actions { display: flex; gap: 6px; flex-wrap: wrap; }
   </style>
 </head>
@@ -83,7 +84,7 @@
       <div class="container">
         <span class="eyebrow">Admin</span>
         <h1>Admin Portal</h1>
-        <p>Review portal access requests and browse the membership roster.</p>
+        <p>Review new member applications, portal access requests, and browse the membership roster.</p>
       </div>
     </section>
 
@@ -109,6 +110,27 @@
         </div>
 
         <div class="admin-state" id="state-admin" hidden>
+
+          <div class="admin-section">
+            <h2>New Member Applications</h2>
+            <div id="applications-empty" class="admin-empty" hidden>No pending applications.</div>
+            <div class="admin-table-wrap" id="applications-table-wrap" hidden>
+              <table class="admin-table">
+                <thead>
+                  <tr>
+                    <th>Applied</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                    <th>Type</th>
+                    <th>Message</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="applications-tbody"></tbody>
+              </table>
+            </div>
+          </div>
 
           <div class="admin-section">
             <h2>Pending Access Requests</h2>
