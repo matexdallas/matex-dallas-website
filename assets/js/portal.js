@@ -101,6 +101,11 @@
   function loadProfile(user) {
     sb.from("members")
       .select("first_name, middle_name, last_name, email, phone, address_line1, address_line2, city, state, postal_code, status, joined_date")
+      // Explicit filter, not just reliance on RLS: an admin's own RLS
+      // policy grants access to ALL rows (not just their own), so
+      // without this .eq() an admin who is also a linked member would
+      // match every row and .maybeSingle() would error.
+      .eq("auth_user_id", user.id)
       .maybeSingle()
       .then(function (res) {
         if (res.error) {
@@ -153,6 +158,7 @@
       sb.from("portal_access_requests")
         .insert({
           user_id: user.id,
+          requester_email: user.email || null,
           claimed_full_name: requestForm.full_name.value.trim(),
           claimed_member_number: requestForm.member_number.value.trim(),
           claimed_phone_last4: requestForm.phone_last4.value.trim() || null

@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Admin — MATEX Dallas</title>
+  <meta name="description" content="MATEX Dallas admin portal.">
+  <link rel="canonical" href="https://matexdallas.org/admin.html">
+  <meta name="theme-color" content="#1B2A4A">
+  <meta name="robots" content="noindex, nofollow">
+
+  <link rel="icon" href="assets/images/logos/matex-favicon.png" type="image/png">
+  <link rel="apple-touch-icon" href="assets/images/logos/matex-favicon.png">
+  <link rel="preload" href="assets/fonts/public-sans-variable.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="assets/fonts/fraunces-variable.woff2" as="font" type="font/woff2" crossorigin>
+
+  <link rel="stylesheet" href="assets/css/variables.css">
+  <link rel="stylesheet" href="assets/css/base.css">
+  <link rel="stylesheet" href="assets/css/layout.css">
+  <link rel="stylesheet" href="assets/css/components.css">
+  <style>
+    .admin-state[hidden] { display: none; }
+    .admin-topbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-6); flex-wrap: wrap; gap: var(--space-3); }
+    .admin-section { margin-bottom: var(--space-8); }
+    .admin-section h2 { margin-bottom: var(--space-4); }
+    .admin-table-wrap { overflow-x: auto; border: 1.5px solid var(--line); border-radius: var(--radius-md); background: var(--bg-raised); }
+    table.admin-table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+    table.admin-table th, table.admin-table td { text-align: left; padding: 10px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+    table.admin-table th { font-size: 0.74rem; text-transform: uppercase; letter-spacing: 0.04em; color: var(--muted); white-space: nowrap; }
+    table.admin-table tr:last-child td { border-bottom: none; }
+    .req-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+    .btn-sm { padding: 7px 14px; font-size: 0.82rem; }
+    .btn-deny { background: transparent; color: var(--red); border: 1.5px solid var(--red); }
+    .btn-deny:hover { background: var(--red); color: #fff; }
+    .match-ok { color: #1a7f37; font-weight: 700; }
+    .match-none { color: var(--red); font-weight: 700; }
+    .admin-search { max-width: 340px; margin-bottom: var(--space-4); }
+    .admin-empty { padding: var(--space-5); color: var(--muted); font-size: 0.9rem; }
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#main-content">Skip to content</a>
+
+  <header class="site-header">
+    <div class="container">
+      <a class="brand" href="index.html" aria-label="MATEX Dallas — home">
+        <img src="assets/images/logos/matex-logo-horizontal.png" alt="MATEX Dallas — One Family" width="220" height="90">
+      </a>
+      <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="main-nav" aria-label="Toggle navigation menu">
+        <span class="bar"></span><span class="bar"></span><span class="bar"></span>
+      </button>
+      <nav class="main-nav" id="main-nav" aria-label="Primary">
+        <ul class="unstyled">
+          <li><a href="index.html">Home</a></li>
+          <li><a href="about.html">About</a></li>
+          <li><a href="programs.html">Programs</a></li>
+          <li><a href="leadership.html">Leadership</a></li>
+          <li><a href="events.html">Events</a></li>
+          <li><a href="gallery.html">Gallery</a></li>
+          <li><a href="membership.html">Membership</a></li>
+          <li><a href="contact.html">Contact</a></li>
+        </ul>
+        <div class="nav-cta"><a href="donate.html" class="btn btn-donate">Donate</a></div>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main-content">
+
+    <section class="page-header">
+      <div class="container">
+        <span class="eyebrow">Admin</span>
+        <h1>Admin Portal</h1>
+        <p>Review portal access requests and browse the membership roster.</p>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container">
+
+        <div class="admin-topbar">
+          <span id="admin-email" style="color: var(--muted); font-size: 0.9rem;"></span>
+          <button type="button" class="btn btn-outline-navy" id="sign-out-btn">Sign Out</button>
+        </div>
+
+        <div class="admin-state" id="state-loading"><p>Loading…</p></div>
+
+        <div class="admin-state" id="state-denied" hidden>
+          <div class="notice-box">
+            This account doesn't have admin access. If you believe it should, an existing admin can add it —
+            see the runbook in <code>supabase/sql/003_admin_portal.sql</code>.
+          </div>
+        </div>
+
+        <div class="admin-state" id="state-error" hidden>
+          <div class="notice-box">Something went wrong loading the admin portal. Please refresh.</div>
+        </div>
+
+        <div class="admin-state" id="state-admin" hidden>
+
+          <div class="admin-section">
+            <h2>Pending Access Requests</h2>
+            <div id="requests-empty" class="admin-empty" hidden>No pending requests.</div>
+            <div class="admin-table-wrap" id="requests-table-wrap" hidden>
+              <table class="admin-table">
+                <thead>
+                  <tr>
+                    <th>Requested</th>
+                    <th>Requester email</th>
+                    <th>Claimed name</th>
+                    <th>Member #</th>
+                    <th>Phone last 4</th>
+                    <th>Match</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="requests-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="admin-section">
+            <h2>Members</h2>
+            <input type="search" class="admin-search" id="member-search" placeholder="Search by name, email, or member #">
+            <div class="admin-table-wrap">
+              <table class="admin-table">
+                <thead>
+                  <tr>
+                    <th>Member #</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                    <th>Status</th>
+                    <th>Joined</th>
+                    <th>Linked</th>
+                  </tr>
+                </thead>
+                <tbody id="members-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="brand-col">
+          <div class="brand"><img src="assets/images/logos/matex-logo-horizontal-transparent.png" alt="MATEX Dallas — One Family" width="150" height="66" loading="lazy" decoding="async"></div>
+          <p style="margin-bottom:12px;"><strong style="display:block; color:var(--sand); font-family:var(--font-display); font-size:1.05rem;">MATEX Dallas, Inc.</strong><span style="font-size:0.85rem; opacity:0.85;">One Family</span></p>
+          <p>Strengthening community through unity, culture, education, and service in the Dallas&ndash;Fort Worth Metroplex.</p>
+        </div>
+        <div>
+          <h4>Quick Links</h4>
+          <ul>
+            <li><a href="about.html">About</a></li>
+            <li><a href="programs.html">Programs</a></li>
+            <li><a href="leadership.html">Leadership</a></li>
+            <li><a href="events.html">Events</a></li>
+            <li><a href="gallery.html">Gallery</a></li>
+            <li><a href="membership.html">Membership</a></li>
+            <li><a href="contact.html">Contact</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4>Support</h4>
+          <ul>
+            <li><a href="donate.html">Donate</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4>Contact</h4>
+          <ul>
+            <li>Rockwall, Texas</li>
+            <li><a href="mailto:matexdallas@gmail.com">matexdallas@gmail.com</a></li>
+            <li><a href="contact.html">Contact Us</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>© <span data-current-year>2026</span> MATEX Dallas. All rights reserved.</span>
+        <span>matexdallas.org</span>
+      </div>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="assets/js/supabase-config.js"></script>
+  <script src="assets/js/admin.js"></script>
+  <script src="assets/js/main.js" defer></script>
+</body>
+</html>
