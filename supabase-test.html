@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Supabase Connection Test — Internal</title>
+  <meta name="robots" content="noindex, nofollow">
+
+  <link rel="stylesheet" href="assets/css/variables.css">
+  <link rel="stylesheet" href="assets/css/base.css">
+
+  <style>
+    .test-wrap {
+      max-width: 42rem;
+      margin: 4rem auto;
+      padding: 0 1.5rem;
+      font-family: var(--font-body, sans-serif);
+    }
+    .test-card {
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      padding: 1.5rem;
+      margin-top: 1rem;
+    }
+    #supabase-test-result[data-status="ok"] { color: #1a7f37; font-weight: 600; }
+    #supabase-test-result[data-status="error"] { color: #b3261e; font-weight: 600; }
+  </style>
+</head>
+<body>
+  <div class="test-wrap">
+    <h1>Supabase Connection Test</h1>
+    <p>Internal diagnostic page. Not linked from site navigation, excluded from search indexing. Confirms the Supabase client initializes and can reach the project — it never queries or displays member data.</p>
+    <div class="test-card">
+      <strong>Status:</strong>
+      <p id="supabase-test-result" data-status="pending">Running test…</p>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="assets/js/supabase-config.js"></script>
+  <script src="assets/js/supabase-connection-test.js"></script>
+</body>
+</html>
