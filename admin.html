@@ -36,6 +36,18 @@
     .match-none { color: var(--red); font-weight: 700; }
     .admin-search { max-width: 340px; margin-bottom: var(--space-4); }
     .admin-empty { padding: var(--space-5); color: var(--muted); font-size: 0.9rem; }
+    .name-edit { display: flex; gap: 6px; flex-wrap: wrap; }
+    .name-edit input {
+      font-family: var(--font-body);
+      font-size: 0.85rem;
+      padding: 6px 8px;
+      border: 1.5px solid var(--line);
+      border-radius: var(--radius-sm);
+      background: var(--bg-raised);
+      color: var(--ink);
+      width: 100px;
+    }
+    .row-actions { display: flex; gap: 6px; flex-wrap: wrap; }
   </style>
 </head>
 <body>
@@ -133,6 +145,7 @@
                     <th>Status</th>
                     <th>Joined</th>
                     <th>Linked</th>
+                    <th>Actions</th>
                   </tr>
                 </thead>
                 <tbody id="members-tbody"></tbody>
