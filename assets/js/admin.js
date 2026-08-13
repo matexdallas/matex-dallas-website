@@ -24,6 +24,10 @@
  *      the admin is entering them fresh, but bulk/ongoing status
  *      changes to existing members are still reserved for a future
  *      "membership status" build.
+ *   6. Load all contact_messages (public Contact page submissions —
+ *      see 005_contact_messages.sql), newest first, with a status
+ *      cycle (new → read → archived). This does not send email;
+ *      there's no email service wired up.
  *
  * Requires assets/js/supabase-config.js to run first.
  */
@@ -68,6 +72,86 @@
     sb.auth.signOut().then(function () {
       window.location.href = "portal-login.html";
     });
+  });
+
+  // ---------------------------------------------------------------
+  // Contact messages
+  // ---------------------------------------------------------------
+  var CONTACT_NEXT_STATUS = { new: "read", read: "archived" };
+  var CONTACT_BUTTON_LABEL = { new: "Mark Read", read: "Archive" };
+
+  function contactActionsHtml(c) {
+    var next = CONTACT_NEXT_STATUS[c.status];
+    if (!next) return "&mdash;"; // archived — no further action
+    return (
+      '<button type="button" class="btn btn-outline-navy btn-sm" data-action="advance-status" data-next="' +
+      next + '">' + CONTACT_BUTTON_LABEL[c.status] + "</button>"
+    );
+  }
+
+  function renderContactMessages(messages) {
+    var wrap = document.getElementById("contact-table-wrap");
+    var empty = document.getElementById("contact-empty");
+    var tbody = document.getElementById("contact-tbody");
+
+    if (!messages.length) {
+      wrap.hidden = true;
+      empty.hidden = false;
+      return;
+    }
+    wrap.hidden = false;
+    empty.hidden = true;
+
+    tbody.innerHTML = messages
+      .map(function (c) {
+        return (
+          '<tr data-message-id="' + c.id + '">' +
+          "<td>" + escapeHtml(new Date(c.created_at).toLocaleDateString()) + "</td>" +
+          "<td>" + escapeHtml(c.name) + "</td>" +
+          "<td>" + escapeHtml(c.email) + "</td>" +
+          "<td>" + escapeHtml(c.reason) + "</td>" +
+          "<td>" + escapeHtml(c.message) + "</td>" +
+          "<td>" + escapeHtml(c.status) + "</td>" +
+          "<td>" + contactActionsHtml(c) + "</td>" +
+          "</tr>"
+        );
+      })
+      .join("");
+  }
+
+  function loadContactMessages() {
+    return sb
+      .from("contact_messages")
+      .select("id, name, email, reason, message, status, created_at")
+      .order("created_at", { ascending: false })
+      .then(function (res) {
+        if (res.error) {
+          console.error("[MATEX Supabase] admin contact_messages select error:", res.error.message);
+          return;
+        }
+        renderContactMessages(res.data || []);
+      });
+  }
+
+  document.getElementById("contact-tbody").addEventListener("click", function (event) {
+    var btn = event.target.closest("button[data-action='advance-status']");
+    if (!btn) return;
+    var row = btn.closest("tr");
+    var messageId = row.getAttribute("data-message-id");
+    var nextStatus = btn.getAttribute("data-next");
+
+    btn.disabled = true;
+    sb.from("contact_messages")
+      .update({ status: nextStatus })
+      .eq("id", messageId)
+      .then(function (res) {
+        if (res.error) throw res.error;
+        return loadContactMessages();
+      })
+      .catch(function (err) {
+        console.error("[MATEX Supabase] contact message status update error:", err && err.message ? err.message : err);
+        btn.disabled = false;
+      });
   });
 
   // ---------------------------------------------------------------
@@ -626,7 +710,7 @@
       showState("admin");
       // loadRequests() matches against allMembers, so members must load first.
       return loadMembers().then(function () {
-        return Promise.all([loadRequests(), loadApplications()]);
+        return Promise.all([loadRequests(), loadApplications(), loadContactMessages()]);
       });
     })
     .catch(function (err) {
