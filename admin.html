@@ -155,6 +155,80 @@
 
           <div class="admin-section">
             <h2>Members</h2>
+            <div style="margin-bottom: var(--space-4);">
+              <button type="button" class="btn btn-outline-navy" id="add-member-toggle">+ Add Member</button>
+            </div>
+
+            <form class="form-grid" id="add-member-form" hidden style="max-width: 640px; margin-bottom: var(--space-6);">
+              <div class="form-2col">
+                <div class="form-row">
+                  <label for="am-member-number">Member number <span class="required-mark">*</span></label>
+                  <input type="text" id="am-member-number" name="member_number" required>
+                </div>
+                <div class="form-row">
+                  <label for="am-status">Status</label>
+                  <input type="text" id="am-status" name="status" value="active">
+                </div>
+              </div>
+              <div class="form-2col">
+                <div class="form-row">
+                  <label for="am-first-name">First name <span class="required-mark">*</span></label>
+                  <input type="text" id="am-first-name" name="first_name" required>
+                </div>
+                <div class="form-row">
+                  <label for="am-last-name">Last name <span class="required-mark">*</span></label>
+                  <input type="text" id="am-last-name" name="last_name" required>
+                </div>
+              </div>
+              <div class="form-row">
+                <label for="am-middle-name">Middle name</label>
+                <input type="text" id="am-middle-name" name="middle_name">
+              </div>
+              <div class="form-2col">
+                <div class="form-row">
+                  <label for="am-email">Email</label>
+                  <input type="email" id="am-email" name="email">
+                </div>
+                <div class="form-row">
+                  <label for="am-phone">Phone</label>
+                  <input type="tel" id="am-phone" name="phone">
+                </div>
+              </div>
+              <div class="form-row">
+                <label for="am-address1">Address</label>
+                <input type="text" id="am-address1" name="address_line1">
+              </div>
+              <div class="form-row">
+                <label for="am-address2">Address line 2</label>
+                <input type="text" id="am-address2" name="address_line2">
+              </div>
+              <div class="form-2col">
+                <div class="form-row">
+                  <label for="am-city">City</label>
+                  <input type="text" id="am-city" name="city">
+                </div>
+                <div class="form-row">
+                  <label for="am-state">State</label>
+                  <input type="text" id="am-state" name="state">
+                </div>
+              </div>
+              <div class="form-2col">
+                <div class="form-row">
+                  <label for="am-postal">ZIP code</label>
+                  <input type="text" id="am-postal" name="postal_code">
+                </div>
+                <div class="form-row">
+                  <label for="am-joined">Joined date</label>
+                  <input type="date" id="am-joined" name="joined_date">
+                </div>
+              </div>
+              <div class="req-actions">
+                <button type="submit" class="btn btn-primary btn-sm">Add Member</button>
+                <button type="button" class="btn btn-deny btn-sm" id="add-member-cancel">Cancel</button>
+              </div>
+              <div id="add-member-message" style="font-size: 0.85rem;" hidden></div>
+            </form>
+
             <input type="search" class="admin-search" id="member-search" placeholder="Search by name, email, or member #">
             <div class="admin-table-wrap">
               <table class="admin-table">
