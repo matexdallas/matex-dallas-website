@@ -6,15 +6,21 @@
  *   2. Check `admins` for a row matching auth.uid() (RLS lets a user
  *      read only their own admin row — see 003_admin_portal.sql). No
  *      row → "access denied", nothing else is fetched.
- *   3. If admin: load pending portal_access_requests (RLS grants
- *      admins full read/update on this table) and try to match each
- *      one to a members row by member_number, so the admin can
- *      approve (link + mark approved) or deny in one click.
- *   4. Also load the full members list (RLS grants admins full read
- *      and update) for browsing/search, with inline editing of names
- *      only (first/middle/last). Other fields — status, contact info,
- *      dues — are still read-only here, reserved for a future
- *      "membership status" build.
+ *   3. If admin: load pending membership_applications (public "apply
+ *      to join" submissions from join.html — see
+ *      004_membership_applications.sql). Approve shows a suggested
+ *      next member number (editable) and, on confirm, creates the
+ *      real members row + marks the application approved. Deny just
+ *      marks it declined.
+ *   4. Load pending portal_access_requests (RLS grants admins full
+ *      read/update on this table) and try to match each one to a
+ *      members row by member_number, so the admin can approve (link +
+ *      mark approved) or deny in one click.
+ *   5. Also load the full members list (RLS grants admins full read,
+ *      update, and insert) for browsing/search, with inline editing
+ *      of names only (first/middle/last). Other fields — status,
+ *      contact info, dues — are still read-only here, reserved for a
+ *      future "membership status" build.
  *
  * Requires assets/js/supabase-config.js to run first.
  */
@@ -195,6 +201,193 @@
   });
 
   // ---------------------------------------------------------------
+  // New member applications
+  // ---------------------------------------------------------------
+  var editingApprovalId = null;
+
+  function suggestNextMemberNumber() {
+    var maxN = 0;
+    var width = 4;
+    allMembers.forEach(function (m) {
+      var match = /^MATEX-(\d+)$/i.exec((m.member_number || "").trim());
+      if (match) {
+        var n = parseInt(match[1], 10);
+        if (n > maxN) maxN = n;
+        width = Math.max(width, match[1].length);
+      }
+    });
+    var next = String(maxN + 1);
+    while (next.length < width) next = "0" + next;
+    return "MATEX-" + next;
+  }
+
+  function applicantName(a) {
+    return [a.first_name, a.middle_name, a.last_name].filter(Boolean).join(" ");
+  }
+
+  function applicationActionsHtml(a) {
+    if (a.id !== editingApprovalId) {
+      return (
+        '<div class="req-actions">' +
+        '<button type="button" class="btn btn-primary btn-sm" data-action="start-approve">Approve</button>' +
+        '<button type="button" class="btn btn-deny btn-sm" data-action="deny-application">Deny</button>' +
+        "</div>"
+      );
+    }
+    return (
+      '<div class="approve-edit">' +
+      '<input type="text" data-field="member_number" value="' + escapeHtml(suggestNextMemberNumber()) + '">' +
+      '<button type="button" class="btn btn-primary btn-sm" data-action="confirm-approve">Confirm</button>' +
+      '<button type="button" class="btn btn-deny btn-sm" data-action="cancel-approve">Cancel</button>' +
+      "</div>"
+    );
+  }
+
+  function renderApplications(applications) {
+    var wrap = document.getElementById("applications-table-wrap");
+    var empty = document.getElementById("applications-empty");
+    var tbody = document.getElementById("applications-tbody");
+
+    if (!applications.length) {
+      wrap.hidden = true;
+      empty.hidden = false;
+      return;
+    }
+    wrap.hidden = false;
+    empty.hidden = true;
+
+    tbody.innerHTML = applications
+      .map(function (a) {
+        return (
+          '<tr data-application-id="' + a.id + '">' +
+          "<td>" + escapeHtml(new Date(a.created_at).toLocaleDateString()) + "</td>" +
+          "<td>" + escapeHtml(applicantName(a)) + "</td>" +
+          "<td>" + escapeHtml(a.email) + "</td>" +
+          "<td>" + escapeHtml(a.phone) + "</td>" +
+          "<td>" + escapeHtml(a.membership_type) + "</td>" +
+          "<td>" + escapeHtml(a.message) + "</td>" +
+          "<td>" + applicationActionsHtml(a) + "</td>" +
+          "</tr>"
+        );
+      })
+      .join("");
+  }
+
+  function loadApplications() {
+    return sb
+      .from("membership_applications")
+      .select("id, first_name, middle_name, last_name, email, phone, address_line1, address_line2, city, state, postal_code, membership_type, message, created_at")
+      .eq("status", "pending")
+      .order("created_at", { ascending: true })
+      .then(function (res) {
+        if (res.error) {
+          console.error("[MATEX Supabase] admin applications select error:", res.error.message);
+          return;
+        }
+        renderApplications(res.data || []);
+      });
+  }
+
+  document.getElementById("applications-tbody").addEventListener("click", function (event) {
+    var btn = event.target.closest("button[data-action]");
+    if (!btn) return;
+    var row = btn.closest("tr");
+    var applicationId = row.getAttribute("data-application-id");
+    var action = btn.getAttribute("data-action");
+
+    if (action === "start-approve") {
+      editingApprovalId = applicationId;
+      loadApplications();
+      return;
+    }
+
+    if (action === "cancel-approve") {
+      editingApprovalId = null;
+      loadApplications();
+      return;
+    }
+
+    if (action === "deny-application") {
+      row.querySelectorAll("button").forEach(function (b) { b.disabled = true; });
+      sb.from("membership_applications")
+        .update({
+          status: "denied",
+          reviewed_at: new Date().toISOString(),
+          reviewed_by: (currentUser && currentUser.email) || "admin"
+        })
+        .eq("id", applicationId)
+        .then(function (res) {
+          if (res.error) throw res.error;
+          return loadApplications();
+        })
+        .catch(function (err) {
+          console.error("[MATEX Supabase] application deny error:", err && err.message ? err.message : err);
+          row.querySelectorAll("button").forEach(function (b) { b.disabled = false; });
+        });
+      return;
+    }
+
+    if (action === "confirm-approve") {
+      var memberNumberInput = row.querySelector('.approve-edit input[data-field="member_number"]');
+      var memberNumber = memberNumberInput.value.trim();
+      if (!memberNumber) return;
+
+      row.querySelectorAll("button, input").forEach(function (el) { el.disabled = true; });
+
+      sb.from("membership_applications")
+        .select("first_name, middle_name, last_name, email, phone, address_line1, address_line2, city, state, postal_code")
+        .eq("id", applicationId)
+        .single()
+        .then(function (res) {
+          if (res.error || !res.data) throw res.error || new Error("Application not found");
+          var a = res.data;
+          return sb
+            .from("members")
+            .insert({
+              member_number: memberNumber,
+              first_name: a.first_name,
+              middle_name: a.middle_name,
+              last_name: a.last_name,
+              email: a.email,
+              phone: a.phone,
+              address_line1: a.address_line1,
+              address_line2: a.address_line2,
+              city: a.city,
+              state: a.state,
+              postal_code: a.postal_code,
+              status: "active",
+              joined_date: new Date().toISOString().slice(0, 10)
+            })
+            .select("id")
+            .single();
+        })
+        .then(function (res) {
+          if (res.error) throw res.error;
+          return sb
+            .from("membership_applications")
+            .update({
+              status: "approved",
+              reviewed_at: new Date().toISOString(),
+              reviewed_by: (currentUser && currentUser.email) || "admin",
+              created_member_id: res.data.id
+            })
+            .eq("id", applicationId);
+        })
+        .then(function (res) {
+          if (res && res.error) throw res.error;
+          editingApprovalId = null;
+          return loadMembers().then(function () {
+            return Promise.all([loadApplications(), loadRequests()]);
+          });
+        })
+        .catch(function (err) {
+          console.error("[MATEX Supabase] application approve error:", err && err.message ? err.message : err);
+          row.querySelectorAll("button, input").forEach(function (el) { el.disabled = false; });
+        });
+    }
+  });
+
+  // ---------------------------------------------------------------
   // Access requests
   // ---------------------------------------------------------------
   function findMatch(memberNumber) {
@@ -343,7 +536,9 @@
       }
       showState("admin");
       // loadRequests() matches against allMembers, so members must load first.
-      return loadMembers().then(loadRequests);
+      return loadMembers().then(function () {
+        return Promise.all([loadRequests(), loadApplications()]);
+      });
     })
     .catch(function (err) {
       console.error("[MATEX Supabase] admin boot threw:", err);
