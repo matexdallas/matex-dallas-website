@@ -119,7 +119,7 @@
     tbody.innerHTML = messages
       .map(function (c) {
         return (
-          '<tr data-message-id="' + c.id + '">' +
+          '<tr data-message-id="' + escapeHtml(c.id) + '">' +
           "<td>" + escapeHtml(new Date(c.created_at).toLocaleDateString()) + "</td>" +
           "<td>" + escapeHtml(c.name) + "</td>" +
           "<td>" + escapeHtml(c.email) + "</td>" +
@@ -621,7 +621,7 @@
     tbody.innerHTML = applications
       .map(function (a) {
         return (
-          '<tr data-application-id="' + a.id + '">' +
+          '<tr data-application-id="' + escapeHtml(a.id) + '">' +
           "<td>" + escapeHtml(new Date(a.created_at).toLocaleDateString()) + "</td>" +
           "<td>" + escapeHtml(applicantName(a)) + "</td>" +
           "<td>" + escapeHtml(a.email) + "</td>" +
@@ -780,7 +780,7 @@
           ? '<span class="match-ok">' + escapeHtml(fullName(match)) + "</span>"
           : '<span class="match-none">No match</span>';
         return (
-          "<tr data-request-id=\"" + r.id + "\" data-member-id=\"" + (match ? match.id : "") + "\">" +
+          "<tr data-request-id=\"" + escapeHtml(r.id) + "\" data-member-id=\"" + (match ? escapeHtml(match.id) : "") + "\">" +
           "<td>" + escapeHtml(new Date(r.created_at).toLocaleDateString()) + "</td>" +
           "<td>" + escapeHtml(r.requester_email) + "</td>" +
           "<td>" + escapeHtml(r.claimed_full_name) + "</td>" +
