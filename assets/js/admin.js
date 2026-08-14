@@ -9,9 +9,11 @@
  *   3. If admin: load pending membership_applications (public "apply
  *      to join" submissions from join.html — see
  *      004_membership_applications.sql). Approve shows a suggested
- *      next member number (editable) and, on confirm, creates the
- *      real members row + marks the application approved. Deny just
- *      marks it declined.
+ *      next member number (editable) and, on confirm, calls the
+ *      approve_membership_application RPC (see
+ *      008_approve_application_rpc.sql) to create the real members
+ *      row and mark the application approved as one atomic
+ *      transaction. Deny just marks it declined.
  *   4. Load pending portal_access_requests (RLS grants admins full
  *      read/update on this table) and try to match each one to a
  *      members row by member_number, so the admin can approve (link +
@@ -696,48 +698,18 @@
 
       row.querySelectorAll("button, input").forEach(function (el) { el.disabled = true; });
 
-      sb.from("membership_applications")
-        .select("first_name, middle_name, last_name, email, phone, address_line1, address_line2, city, state, postal_code, membership_type")
-        .eq("id", applicationId)
-        .single()
-        .then(function (res) {
-          if (res.error || !res.data) throw res.error || new Error("Application not found");
-          var a = res.data;
-          return sb
-            .from("members")
-            .insert({
-              member_number: memberNumber,
-              first_name: a.first_name,
-              middle_name: a.middle_name,
-              last_name: a.last_name,
-              email: a.email,
-              phone: a.phone,
-              address_line1: a.address_line1,
-              address_line2: a.address_line2,
-              city: a.city,
-              state: a.state,
-              postal_code: a.postal_code,
-              status: "active",
-              joined_date: new Date().toISOString().slice(0, 10),
-              membership_type: a.membership_type || null
-            })
-            .select("id")
-            .single();
-        })
+      // Single atomic call (see supabase/sql/008_approve_application_rpc.sql):
+      // reads the application, inserts the member, and marks the
+      // application approved all in one Postgres transaction, instead of
+      // three separate network calls that could partially fail and leave
+      // a member inserted but the application still "pending" — which
+      // used to let a retry create a duplicate member row.
+      sb.rpc("approve_membership_application", {
+        p_application_id: applicationId,
+        p_member_number: memberNumber
+      })
         .then(function (res) {
           if (res.error) throw res.error;
-          return sb
-            .from("membership_applications")
-            .update({
-              status: "approved",
-              reviewed_at: new Date().toISOString(),
-              reviewed_by: (currentUser && currentUser.email) || "admin",
-              created_member_id: res.data.id
-            })
-            .eq("id", applicationId);
-        })
-        .then(function (res) {
-          if (res && res.error) throw res.error;
           editingApprovalId = null;
           return loadMembers().then(function () {
             return Promise.all([loadApplications(), loadRequests()]);
