@@ -244,7 +244,7 @@
               "<td>" + escapeHtml(p.payment_method) + "</td>" +
               "<td>" + escapeHtml(p.note) + "</td>" +
               '<td><button type="button" class="btn btn-deny btn-sm" data-action="remove-payment" data-payment-id="' +
-              p.id + '">Remove</button></td>' +
+              escapeHtml(p.id) + '">Remove</button></td>' +
               "</tr>"
             );
           })
@@ -254,7 +254,7 @@
     var today = new Date().toISOString().slice(0, 10);
 
     return (
-      '<tr class="dues-panel-row" data-member-id="' + m.id + '"><td colspan="9"><div class="dues-panel">' +
+      '<tr class="dues-panel-row" data-member-id="' + escapeHtml(m.id) + '"><td colspan="9"><div class="dues-panel">' +
       '<div class="form-row" style="max-width:240px; margin-bottom: var(--space-4);">' +
       "<label>Membership type</label>" + typeSelectHtml +
       "</div>" +
@@ -279,7 +279,7 @@
     tbody.innerHTML = members
       .map(function (m) {
         var row =
-          '<tr data-member-id="' + m.id + '">' +
+          '<tr data-member-id="' + escapeHtml(m.id) + '">' +
           "<td>" + escapeHtml(m.member_number) + "</td>" +
           "<td>" + nameCellHtml(m) + "</td>" +
           "<td>" + escapeHtml(m.email) + "</td>" +
