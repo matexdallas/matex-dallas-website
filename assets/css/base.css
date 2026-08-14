@@ -26,6 +26,10 @@
 html {
   scroll-behavior: smooth;
   -webkit-text-size-adjust: 100%;
+  /* The site has no dark theme — pin native form/scrollbar chrome (select
+     dropdowns, scrollbars, etc.) to light rendering even when the OS/browser
+     prefers dark, so nothing outside our own CSS goes dark against it. */
+  color-scheme: light;
 }
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
