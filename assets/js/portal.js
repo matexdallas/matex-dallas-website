@@ -62,9 +62,15 @@
     });
   });
 
-  function loadRequestStatus() {
+  function loadRequestStatus(userId) {
     sb.from("portal_access_requests")
       .select("status, created_at")
+      // Explicit filter, not just reliance on RLS — same reasoning as the
+      // .eq() on the members query below: if this table's RLS grants
+      // admins (or anyone else) broader read access, an unfiltered
+      // order+limit(1) here could return someone else's request instead
+      // of the signed-in user's own.
+      .eq("user_id", userId)
       .order("created_at", { ascending: false })
       .limit(1)
       .then(function (res) {
@@ -114,7 +120,7 @@
           return;
         }
         if (!res.data) {
-          loadRequestStatus();
+          loadRequestStatus(user.id);
           return;
         }
         var m = res.data;
@@ -170,7 +176,7 @@
             btn.textContent = "Request Access";
             return;
           }
-          loadRequestStatus();
+          loadRequestStatus(user.id);
         })
         .catch(function (err) {
           console.error("[MATEX Supabase] portal_access_requests insert threw:", err);
