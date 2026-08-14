@@ -1,0 +1,45 @@
+-- MATEX Dallas — Enforce uniqueness on members.member_number
+-- =========================================================
+-- Run this in the Supabase SQL editor, any time after the base
+-- `members` table exists (it predates this repo's numbered migrations
+-- — see the note in 002_member_portal.sql).
+--
+-- WHY THIS EXISTS
+--   The admin portal's "Approve application" flow (admin.js,
+--   confirm-approve handler) does three sequential, non-atomic steps:
+--     1. read the application
+--     2. INSERT a new members row
+--     3. mark the application approved
+--   If step 3 fails after step 2 succeeds (a network blip, an RLS
+--   hiccup, anything), the application still shows as pending in the
+--   UI, and nothing stops an admin from clicking "Confirm" again —
+--   which would silently create a second, duplicate member row for
+--   the same person. A UNIQUE index on member_number turns that
+--   silent duplicate into a loud, catchable insert error instead.
+--
+--   This is a safety net, not the full fix — the real fix is making
+--   that 3-step sequence transactional (a single SECURITY DEFINER
+--   RPC, same pattern as 001_member_lookup_function.sql). This
+--   migration is cheap, safe to run today, and worth having either
+--   way.
+--
+-- BEFORE RUNNING: if member_number can legitimately be blank/NULL for
+-- some existing rows (e.g. very old records entered before numbers
+-- were assigned), note that a UNIQUE index allows multiple NULLs by
+-- default in Postgres — only non-NULL duplicates are rejected, so
+-- that's not a blocker.
+--
+-- IF THIS FAILS: a "could not create unique index — duplicate key
+-- value violates" error means you already have duplicate
+-- member_number values in the live table. That's a real data problem
+-- to clean up by hand before this can be applied — find them with:
+--   select member_number, count(*)
+--   from members
+--   where member_number is not null
+--   group by member_number
+--   having count(*) > 1;
+--
+-- Safe to re-run: IF NOT EXISTS makes this a no-op if it's already in place.
+
+create unique index if not exists members_member_number_unique
+  on members (member_number);
