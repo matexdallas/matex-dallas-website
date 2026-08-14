@@ -21,6 +21,11 @@
   z-index: 50;
   background: var(--bg-raised);
   border-bottom: 1px solid var(--line);
+  box-shadow: 0 0 0 rgba(27, 42, 74, 0);
+  transition: box-shadow 0.25s var(--ease);
+}
+.site-header.is-scrolled {
+  box-shadow: 0 4px 16px rgba(27, 42, 74, 0.09);
 }
 .site-header .container {
   display: flex;
@@ -71,12 +76,23 @@
     flex-direction: column;
     align-items: stretch;
     padding: var(--space-4) var(--space-5) var(--space-5);
-    display: none;
+    display: flex;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-8px);
+    pointer-events: none;
+    transition: opacity 0.22s var(--ease), transform 0.22s var(--ease), visibility 0.22s;
   }
-  .main-nav.open { display: flex; }
+  .main-nav.open {
+    opacity: 1;
+    visibility: visible;
+    transform: none;
+    pointer-events: auto;
+  }
   .main-nav ul { flex-direction: column; gap: 0; }
   .main-nav ul li { border-bottom: 1px solid var(--line); }
-  .main-nav ul li a { display: block; padding: var(--space-3) 0; }
+  .main-nav ul li a { display: block; padding: var(--space-3) 0; transition: padding-left 0.15s var(--ease); }
+  .main-nav ul li a:hover { padding-left: var(--space-2); }
   .main-nav .nav-cta { margin-top: var(--space-4); }
 }
 
@@ -128,7 +144,14 @@
   position: absolute; inset: 0;
   z-index: 0;
 }
-.hero .bg img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 22%; }
+.hero .bg img {
+  width: 100%; height: 100%; object-fit: cover; object-position: 50% 22%;
+  animation: hero-zoom 22s ease-in-out infinite alternate;
+}
+@keyframes hero-zoom {
+  from { transform: scale(1); }
+  to { transform: scale(1.08); }
+}
 @media (max-width: 640px) {
   .hero .bg img { object-position: 50% 14%; } /* narrower crop on mobile — bias higher so the group isn't cut off */
 }
@@ -143,6 +166,21 @@
 .hero h1 { color: #FFFFFF; }
 .hero p.lede { color: #F0EAD9; font-size: 1.15rem; max-width: 52ch; }
 .hero .cta-row { display: flex; flex-wrap: wrap; gap: var(--space-3); margin-top: var(--space-5); }
+
+/* Staggered entrance on load — pure CSS, no JS/scroll dependency since
+   the hero is always in view on first paint. */
+.hero-content > * {
+  opacity: 0;
+  transform: translateY(18px);
+  animation: hero-in 0.8s var(--ease) forwards;
+}
+.hero-content .eyebrow { animation-delay: 0.1s; }
+.hero-content h1 { animation-delay: 0.22s; }
+.hero-content .lede { animation-delay: 0.36s; }
+.hero-content .cta-row { animation-delay: 0.5s; }
+@keyframes hero-in {
+  to { opacity: 1; transform: none; }
+}
 
 /* ---------- Interior page header ---------- */
 /* Simpler navy band used on every page except Home, which gets the full

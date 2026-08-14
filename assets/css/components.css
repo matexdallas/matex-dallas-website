@@ -37,9 +37,12 @@
   overflow: hidden;
   display: flex;
   flex-direction: column;
+  transition: transform 0.25s var(--ease), box-shadow 0.25s var(--ease);
 }
+.card:hover { transform: translateY(-5px); box-shadow: 0 14px 28px rgba(27,42,74,0.12); }
 .card .card-img { aspect-ratio: 4 / 3; overflow: hidden; position: relative; }
-.card .card-img img { width: 100%; height: 100%; object-fit: cover; }
+.card .card-img img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.35s var(--ease); }
+.card:hover .card-img img { transform: scale(1.05); }
 .card .card-body { padding: var(--space-4) var(--space-5) var(--space-5); }
 .card h3 { margin-bottom: var(--space-2); font-size: 1.1rem; }
 .card p { font-size: 0.92rem; color: var(--muted); margin-bottom: var(--space-3); }
@@ -62,7 +65,8 @@
 .event-meta { font-size: 0.85rem; color: var(--muted); display: flex; flex-wrap: wrap; gap: 4px 10px; margin-bottom: var(--space-2); }
 
 /* ---------- Stat tiles ---------- */
-.stat-tile { text-align: center; }
+.stat-tile { text-align: center; transition: transform 0.25s var(--ease); }
+.stat-tile:hover { transform: translateY(-3px); }
 .stat-tile .num { font-family: var(--font-display); font-size: clamp(1.4rem, 4vw, 2.6rem); color: var(--navy); font-weight: 600; line-height: 1.1; overflow-wrap: break-word; }
 .stat-tile .lbl { font-size: 0.85rem; color: var(--muted); margin-top: var(--space-2); }
 .stat-tile .flag { display: inline-block; font-size: 0.68rem; color: var(--red); font-style: italic; margin-top: 4px; }
@@ -77,7 +81,8 @@
   border: 3px solid var(--bg-raised);
   box-shadow: 0 0 0 1px var(--line);
 }
-.leader-card .photo img { width: 100%; height: 100%; object-fit: cover; }
+.leader-card .photo img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.35s var(--ease); }
+.leader-card:hover .photo img { transform: scale(1.08); }
 .leader-card .name { font-weight: 700; font-size: 0.98rem; margin-bottom: 2px; }
 .leader-card .role { font-size: 0.82rem; color: var(--muted); }
 
@@ -98,6 +103,7 @@
   border: none;
   box-shadow: none;
   margin: 0 0 var(--space-3);
+  overflow: hidden;
 }
 .initials-avatar {
   width: 100%;
@@ -185,8 +191,11 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-3);
+  transition: transform 0.25s var(--ease), box-shadow 0.25s var(--ease);
 }
+.tier-card:hover { transform: translateY(-5px); box-shadow: 0 14px 28px rgba(27,42,74,0.1); }
 .tier-card.featured { border-color: var(--gold); box-shadow: 0 0 0 2px var(--gold); }
+.tier-card.featured:hover { box-shadow: 0 0 0 2px var(--gold), 0 14px 28px rgba(27,42,74,0.1); }
 .tier-card .tier-name { font-family: var(--font-display); font-size: 1.3rem; color: var(--navy); }
 .tier-card .tier-price { font-size: 1.6rem; font-weight: 700; color: var(--ink); }
 .tier-card .tier-price small { font-size: 0.7rem; font-weight: 500; color: var(--muted); }
@@ -347,7 +356,8 @@
 }
 
 /* ---------- Icon cards (Featured Activities) ---------- */
-.icon-card { text-align: center; padding: var(--space-5) var(--space-4); }
+.icon-card { text-align: center; padding: var(--space-5) var(--space-4); transition: transform 0.25s var(--ease); }
+.icon-card:hover { transform: translateY(-5px); }
 .icon-card .icon-wrap {
   width: 56px; height: 56px;
   border-radius: 50%;
@@ -355,7 +365,9 @@
   color: var(--sand);
   display: flex; align-items: center; justify-content: center;
   margin: 0 auto var(--space-4);
+  transition: transform 0.25s var(--ease), background 0.25s var(--ease);
 }
+.icon-card:hover .icon-wrap { transform: scale(1.1); background: var(--red); }
 .icon-card .icon-wrap svg { width: 26px; height: 26px; }
 .icon-card h3 { font-size: 1.05rem; margin-bottom: var(--space-2); }
 .icon-card p { font-size: 0.9rem; color: var(--muted); margin: 0 auto; max-width: 30ch; }
@@ -457,7 +469,9 @@
   align-items: center;
   text-align: center;
   gap: var(--space-4);
+  transition: transform 0.25s var(--ease), box-shadow 0.25s var(--ease);
 }
+.payment-card:hover { transform: translateY(-5px); box-shadow: 0 14px 28px rgba(27,42,74,0.1); }
 .payment-card h2 { color: var(--navy); font-size: 1.4rem; }
 .payment-card > p { color: var(--muted); max-width: 40ch; margin: 0; }
 .qr-frame {
@@ -485,6 +499,33 @@
 .payment-recipient strong { color: var(--navy); }
 .payment-note { margin: 0; font-size: 0.85rem; color: var(--muted); max-width: 38ch; }
 .payment-note--verify { color: var(--red); font-weight: 700; }
+
+/* ---------- Back to top ---------- */
+/* Injected into the DOM by main.js on every page — CSS-only fallback isn't
+   possible here since visibility depends on scroll position. */
+.back-to-top {
+  position: fixed;
+  right: var(--space-5);
+  bottom: var(--space-5);
+  z-index: 60;
+  width: 46px; height: 46px;
+  border-radius: 50%;
+  background: var(--navy);
+  color: var(--sand);
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 6px 18px rgba(27,42,74,0.28);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(14px);
+  transition: opacity 0.25s var(--ease), transform 0.25s var(--ease), visibility 0.25s, background 0.15s var(--ease);
+}
+.back-to-top.is-visible { opacity: 1; visibility: visible; transform: none; }
+.back-to-top:hover { background: var(--red); }
+.back-to-top svg { width: 20px; height: 20px; }
 
 /* ---------- Section footer link row ---------- */
 .section-cta { display: flex; justify-content: space-between; align-items: baseline; gap: var(--space-4); flex-wrap: wrap; margin-bottom: var(--space-6); }
