@@ -45,7 +45,7 @@
       ".step", ".payment-card", ".about-preview", ".leader-spotlight",
       ".leader-card", ".gallery-masonry a", ".cta-band", ".founded-badge",
       ".event-feature", ".value-chip", ".notice-box", ".impact-video",
-      ".filter-gallery .thumb"
+      ".filter-gallery .thumb", ".contact-grid > div", ".info-list li"
     ].join(", ");
 
     var revealItems = document.querySelectorAll(revealSelector);
