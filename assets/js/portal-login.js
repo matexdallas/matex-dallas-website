@@ -11,7 +11,13 @@
  * passed through raw, so it can't be used to send anyone off-site. Magic
  * link and new-account sign-up both require the member to click a link
  * emailed to them before they're actually signed in — the redirect target
- * survives that round trip via emailRedirectTo.
+ * survives that round trip via emailRedirectTo, but only if
+ * admin.html/portal.html are both on Supabase's Authentication → URL
+ * Configuration → Redirect URLs allow-list, or Supabase silently ignores
+ * our requested emailRedirectTo and falls back to its own default. To
+ * sidestep that dependency entirely for admin sign-ins, the Email Link
+ * tab is hidden whenever redirect=admin.html — only Email & Password
+ * (a pure client-side redirect, no allow-list involved) is offered.
  *
  * Requires assets/js/supabase-config.js to run first.
  */
@@ -49,6 +55,7 @@
   // ---------------------------------------------------------------
   // Tabs: Email Link vs Email & Password
   // ---------------------------------------------------------------
+  var authTabs = document.getElementById("auth-tabs");
   var tabLink = document.getElementById("tab-link");
   var tabPassword = document.getElementById("tab-password");
   var panelLink = document.getElementById("panel-link");
@@ -64,6 +71,15 @@
 
   tabLink.addEventListener("click", function () { selectTab("link"); });
   tabPassword.addEventListener("click", function () { selectTab("password"); });
+
+  if (redirectTarget === "admin.html") {
+    // Signing in specifically to reach the admin portal: skip the tab
+    // picker entirely and go straight to Email & Password, which
+    // doesn't depend on Supabase's redirect-URL allow-list (see the
+    // file header comment).
+    authTabs.hidden = true;
+    selectTab("password");
+  }
 
   // ---------------------------------------------------------------
   // Magic link
