@@ -19,13 +19,21 @@
  *      members row by member_number, so the admin can approve (link +
  *      mark approved) or deny in one click.
  *   5. Also load the full members list (RLS grants admins full read,
- *      update, and insert) for browsing/search, with inline editing
- *      of names only (first/middle/last) and a manual "+ Add Member"
- *      form for entering someone directly (not via a join.html
- *      application) — status/contact/address are settable there since
- *      the admin is entering them fresh, but bulk/ongoing status
- *      changes to existing members are still reserved for a future
- *      "membership status" build.
+ *      update, and insert) for browsing/search, plus a manual
+ *      "+ Add Member" form for entering someone directly (not via a
+ *      join.html application).
+ *
+ *      Editing an existing member is permission-gated (see
+ *      012_admin_permission_tiers.sql): every admin can edit name
+ *      fields inline. An admin whose `admins` row has
+ *      can_edit_all_fields = true instead gets a full edit panel
+ *      (email, phone, address, status, membership type, member
+ *      number, joined date) — enforced by a DB trigger, not just
+ *      hidden in the UI, so a limited admin's attempt to change a
+ *      non-name field via a direct API call is rejected the same way.
+ *      Deleting a member (and removing a logged dues payment) is
+ *      similarly gated on can_delete and hidden from the UI entirely
+ *      for admins who don't have it.
  *   6. Load all contact_messages (public Contact page submissions —
  *      see 005_contact_messages.sql), newest first, with a status
  *      cycle (new → read → archived). This does not send email;
@@ -60,6 +68,11 @@
   // Matches the pricing on membership.html — update both places if it changes.
   var DUES_AMOUNTS = { single: 85, couple: 170 };
   var editingMemberId = null;
+  // Set during boot from this admin's own `admins` row (012_admin_permission_tiers.sql).
+  // Both default to false until boot resolves, so nothing destructive/
+  // broad-scope renders before we actually know this admin's capabilities.
+  var currentAdminCanEditAllFields = false;
+  var currentAdminCanDelete = false;
 
   var states = {
     loading: document.getElementById("state-loading"),
@@ -174,7 +187,10 @@
   // Members table
   // ---------------------------------------------------------------
   function nameCellHtml(m) {
-    if (m.id !== editingMemberId) {
+    // Full-access admins edit via the panel (memberEditPanelHtml) below
+    // the row instead of inline here, since the panel also covers
+    // fields (address, etc.) that have no table column to edit inline.
+    if (m.id !== editingMemberId || currentAdminCanEditAllFields) {
       return escapeHtml(fullName(m));
     }
     return (
@@ -188,18 +204,69 @@
 
   function actionsCellHtml(m) {
     if (m.id !== editingMemberId) {
-      return (
-        '<div class="row-actions">' +
-        '<button type="button" class="btn btn-outline-navy btn-sm" data-action="edit-name">Edit</button>' +
-        '<button type="button" class="btn btn-deny btn-sm" data-action="delete-member">Delete</button>' +
-        "</div>"
-      );
+      var html = '<div class="row-actions">' +
+        '<button type="button" class="btn btn-outline-navy btn-sm" data-action="edit-name">Edit</button>';
+      if (currentAdminCanDelete) {
+        html += '<button type="button" class="btn btn-deny btn-sm" data-action="delete-member">Delete</button>';
+      }
+      return html + "</div>";
+    }
+    if (currentAdminCanEditAllFields) {
+      // Save lives inside the panel's own form (memberEditPanelHtml) —
+      // this button just closes it without saving.
+      return '<button type="button" class="btn btn-deny btn-sm" data-action="cancel-name">Close</button>';
     }
     return (
       '<div class="row-actions">' +
       '<button type="button" class="btn btn-primary btn-sm" data-action="save-name">Save</button>' +
       '<button type="button" class="btn btn-deny btn-sm" data-action="cancel-name">Cancel</button>' +
       "</div>"
+    );
+  }
+
+  function memberEditPanelHtml(m) {
+    function field(label, name, value, type) {
+      return (
+        '<div class="form-row"><label>' + escapeHtml(label) + "</label>" +
+        '<input type="' + (type || "text") + '" data-field="' + name + '" value="' + escapeHtml(value) + '"></div>'
+      );
+    }
+    return (
+      '<tr class="member-edit-panel-row" data-member-id="' + escapeHtml(m.id) + '"><td colspan="9"><div class="dues-panel">' +
+      '<form class="form-grid member-edit-form">' +
+      '<div class="form-2col">' +
+      field("First name", "first_name", m.first_name) +
+      field("Last name", "last_name", m.last_name) +
+      "</div>" +
+      field("Middle name", "middle_name", m.middle_name) +
+      '<div class="form-2col">' +
+      field("Email", "email", m.email, "email") +
+      field("Phone", "phone", m.phone, "tel") +
+      "</div>" +
+      '<div class="form-2col">' +
+      field("Member number", "member_number", m.member_number) +
+      field("Status", "status", m.status) +
+      "</div>" +
+      field("Address line 1", "address_line1", m.address_line1) +
+      field("Address line 2", "address_line2", m.address_line2) +
+      '<div class="form-2col">' +
+      field("City", "city", m.city) +
+      field("State", "state", m.state) +
+      "</div>" +
+      '<div class="form-2col">' +
+      field("ZIP code", "postal_code", m.postal_code) +
+      field("Joined date", "joined_date", m.joined_date, "date") +
+      "</div>" +
+      '<div class="form-row" style="max-width:240px;">' +
+      '<label>Membership type</label>' +
+      '<select data-field="membership_type">' +
+      '<option value=""' + (!m.membership_type ? " selected" : "") + ">Not set</option>" +
+      '<option value="single"' + (m.membership_type === "single" ? " selected" : "") + ">Single — $85/yr</option>" +
+      '<option value="couple"' + (m.membership_type === "couple" ? " selected" : "") + ">Couple — $170/yr</option>" +
+      "</select></div>" +
+      '<button type="submit" class="btn btn-primary btn-sm">Save</button>' +
+      "</form>" +
+      "</div></td></tr>"
     );
   }
 
@@ -243,6 +310,10 @@
     var historyRows = payments.length
       ? payments
           .map(function (p) {
+            var removeCell = currentAdminCanDelete
+              ? '<button type="button" class="btn btn-deny btn-sm" data-action="remove-payment" data-payment-id="' +
+                escapeHtml(p.id) + '">Remove</button>'
+              : "&mdash;";
             return (
               "<tr>" +
               "<td>" + escapeHtml(p.payment_date) + "</td>" +
@@ -250,8 +321,7 @@
               "<td>$" + Number(p.amount).toFixed(2) + "</td>" +
               "<td>" + escapeHtml(p.payment_method) + "</td>" +
               "<td>" + escapeHtml(p.note) + "</td>" +
-              '<td><button type="button" class="btn btn-deny btn-sm" data-action="remove-payment" data-payment-id="' +
-              escapeHtml(p.id) + '">Remove</button></td>' +
+              "<td>" + removeCell + "</td>" +
               "</tr>"
             );
           })
@@ -297,7 +367,9 @@
           "<td>" + (m.auth_user_id ? "Yes" : "&mdash;") + "</td>" +
           "<td>" + actionsCellHtml(m) + "</td>" +
           "</tr>";
-        return m.id === expandedDuesMemberId ? row + duesPanelRowHtml(m) : row;
+        if (m.id === expandedDuesMemberId) row += duesPanelRowHtml(m);
+        if (m.id === editingMemberId && currentAdminCanEditAllFields) row += memberEditPanelHtml(m);
+        return row;
       })
       .join("");
   }
@@ -321,7 +393,7 @@
   function loadMembers() {
     return sb
       .from("members")
-      .select("id, member_number, first_name, middle_name, last_name, email, phone, status, joined_date, auth_user_id, membership_type")
+      .select("id, member_number, first_name, middle_name, last_name, email, phone, status, joined_date, auth_user_id, membership_type, address_line1, address_line2, city, state, postal_code")
       .order("last_name", { ascending: true })
       .then(function (res) {
         if (res.error) {
@@ -395,7 +467,12 @@
           return loadMembers();
         })
         .catch(function (err) {
-          console.error("[MATEX Supabase] members delete error:", err && err.message ? err.message : err);
+          var message = err && err.message ? err.message : String(err);
+          console.error("[MATEX Supabase] members delete error:", message);
+          // A failed delete (e.g. blocked by a foreign key, or an RLS/
+          // permissions issue) previously failed silently — nothing
+          // told the admin it didn't work short of opening DevTools.
+          window.alert("Couldn't delete " + confirmName + " — " + message);
           btn.disabled = false;
         });
       return;
@@ -412,7 +489,9 @@
           return loadDuesPayments().then(refreshMembersTable);
         })
         .catch(function (err) {
-          console.error("[MATEX Supabase] dues_payments delete error:", err && err.message ? err.message : err);
+          var message = err && err.message ? err.message : String(err);
+          console.error("[MATEX Supabase] dues_payments delete error:", message);
+          window.alert("Couldn't remove that payment — " + message);
           btn.disabled = false;
         });
       return;
@@ -467,12 +546,51 @@
         return loadMembers();
       })
       .catch(function (err) {
-        console.error("[MATEX Supabase] membership_type update error:", err && err.message ? err.message : err);
+        var message = err && err.message ? err.message : String(err);
+        console.error("[MATEX Supabase] membership_type update error:", message);
+        window.alert("Couldn't update membership type — " + message);
         select.disabled = false;
       });
   });
 
   document.getElementById("members-tbody").addEventListener("submit", function (event) {
+    var editForm = event.target.closest(".member-edit-form");
+    if (editForm) {
+      event.preventDefault();
+      var editMemberId = editForm.closest("tr").getAttribute("data-member-id");
+      var updates = {};
+      editForm.querySelectorAll("[data-field]").forEach(function (input) {
+        updates[input.getAttribute("data-field")] = input.value.trim() || null;
+      });
+      if (!updates.first_name || !updates.last_name) {
+        window.alert("First and last name are required.");
+        return;
+      }
+
+      var editSubmitBtn = editForm.querySelector("button[type='submit']");
+      editSubmitBtn.disabled = true;
+      editSubmitBtn.textContent = "Saving…";
+
+      sb.from("members")
+        .update(updates)
+        .eq("id", editMemberId)
+        .then(function (res) {
+          if (res.error) throw res.error;
+          editingMemberId = null;
+          return loadMembers();
+        })
+        .catch(function (err) {
+          var message = err && err.message ? err.message : String(err);
+          console.error("[MATEX Supabase] member edit error:", message);
+          window.alert("Couldn't save changes — " + message);
+        })
+        .finally(function () {
+          editSubmitBtn.disabled = false;
+          editSubmitBtn.textContent = "Save";
+        });
+      return;
+    }
+
     var form = event.target.closest(".dues-add-form");
     if (!form) return;
     event.preventDefault();
@@ -890,7 +1008,7 @@
       currentUser = session.user;
       document.getElementById("admin-email").textContent = currentUser.email || "";
 
-      return sb.from("admins").select("id").eq("id", currentUser.id).maybeSingle();
+      return sb.from("admins").select("id, can_edit_all_fields, can_delete").eq("id", currentUser.id).maybeSingle();
     })
     .then(function (res) {
       if (!res) return; // already redirected
@@ -903,6 +1021,8 @@
         showState("denied");
         return;
       }
+      currentAdminCanEditAllFields = !!res.data.can_edit_all_fields;
+      currentAdminCanDelete = !!res.data.can_delete;
       showState("admin");
       document.getElementById("dues-year-label").textContent = DUES_YEAR;
       // Dues payments must load before members, since the roster's Dues
