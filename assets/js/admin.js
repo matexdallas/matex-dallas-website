@@ -850,7 +850,7 @@
     .then(function (res) {
       var session = res.data && res.data.session;
       if (!session) {
-        window.location.href = "portal-login.html";
+        window.location.href = "portal-login.html?redirect=admin.html";
         return;
       }
       currentUser = session.user;
