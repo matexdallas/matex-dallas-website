@@ -1,12 +1,19 @@
 /**
  * MATEX Dallas — Member Lookup
  * ===============================
- * Lets a member check their own status using Email + Member Number.
- * Calls the `lookup_member_status` Postgres RPC function — it never
- * queries the members table directly, and the function only ever
- * returns {full_name, status} for an exact two-factor match. No other
+ * Lets a member check their own status using Email alone. Calls the
+ * single-argument overload of the `lookup_member_status` Postgres RPC
+ * function (see supabase/sql/009_member_lookup_email_only.sql) — it
+ * never queries the members table directly, and the function only
+ * ever returns {full_name, status} for an exact email match. No other
  * member fields (phone, address, DOB, notes, etc.) are requested or
  * displayed.
+ *
+ * NOTE: dropping the member-number factor means this is no longer a
+ * two-factor lookup — anyone who knows a member's email can retrieve
+ * their name and status here, with no inbox-ownership check. See the
+ * trade-off writeup in 009_member_lookup_email_only.sql before
+ * changing this further.
  *
  * Requires, in this order:
  *   1. https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2
@@ -53,10 +60,9 @@
     }
 
     var email = form.email.value.trim();
-    var memberNumber = form.member_number.value.trim();
 
-    if (!email || !memberNumber) {
-      showResult("error", "Please enter both your email and member number.");
+    if (!email) {
+      showResult("error", "Please enter your email.");
       return;
     }
 
@@ -66,7 +72,7 @@
     showResult("pending", "Checking membership status…");
 
     window.matexSupabase
-      .rpc("lookup_member_status", { p_email: email, p_member_number: memberNumber })
+      .rpc("lookup_member_status", { p_email: email })
       .then(function (res) {
         if (res.error) {
           console.error("[MATEX Supabase] lookup_member_status error:", res.error.message);
@@ -77,7 +83,7 @@
         if (!row) {
           showResult(
             "not-found",
-            "No membership found matching that email and member number. Double-check both fields, or contact us if you believe this is an error."
+            "No membership found matching that email. Double-check it, or contact us if you believe this is an error."
           );
           return;
         }
