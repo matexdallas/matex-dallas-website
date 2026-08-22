@@ -5,9 +5,13 @@
  *   - Magic link (passwordless): supabase.auth.signInWithOtp
  *   - Email + password: supabase.auth.signInWithPassword / signUp
  *
- * On any successful sign-in, redirects to portal.html. Magic link and
- * new-account sign-up both require the member to click a link emailed
- * to them before they're actually signed in.
+ * On any successful sign-in, redirects to portal.html by default, or to
+ * admin.html when reached as portal-login.html?redirect=admin.html (see
+ * admin.js's auth-guard redirect). The redirect param is whitelisted, not
+ * passed through raw, so it can't be used to send anyone off-site. Magic
+ * link and new-account sign-up both require the member to click a link
+ * emailed to them before they're actually signed in — the redirect target
+ * survives that round trip via emailRedirectTo.
  *
  * Requires assets/js/supabase-config.js to run first.
  */
@@ -21,16 +25,24 @@
 
   var messageEl = document.getElementById("auth-message");
 
+  // Where to send the member/admin after a successful sign-in. Pages that
+  // bounce here for an auth check (e.g. admin.html) pass ?redirect=admin.html
+  // so we return them to where they were headed instead of always dropping
+  // everyone on the member portal. Whitelisted, not passed through raw, so
+  // this query param can't be used to redirect off-site.
+  var REDIRECT_TARGETS = { "admin.html": "admin.html" };
+  var redirectTarget = REDIRECT_TARGETS[new URLSearchParams(window.location.search).get("redirect")] || "portal.html";
+
   function showMessage(state, text) {
     messageEl.dataset.state = state;
     messageEl.textContent = text;
     messageEl.hidden = false;
   }
 
-  // If already signed in, skip straight to the portal.
+  // If already signed in, skip straight to the intended destination.
   window.matexSupabase.auth.getSession().then(function (res) {
     if (res.data && res.data.session) {
-      window.location.href = "portal.html";
+      window.location.href = redirectTarget;
     }
   });
 
@@ -69,7 +81,7 @@
     window.matexSupabase.auth
       .signInWithOtp({
         email: email,
-        options: { emailRedirectTo: window.location.origin + "/portal.html" }
+        options: { emailRedirectTo: window.location.origin + "/" + redirectTarget }
       })
       .then(function (res) {
         if (res.error) {
@@ -132,7 +144,7 @@
       ? window.matexSupabase.auth.signUp({
           email: email,
           password: password,
-          options: { emailRedirectTo: window.location.origin + "/portal.html" }
+          options: { emailRedirectTo: window.location.origin + "/" + redirectTarget }
         })
       : window.matexSupabase.auth.signInWithPassword({ email: email, password: password });
 
@@ -151,7 +163,7 @@
           return;
         }
         // Signed in.
-        window.location.href = "portal.html";
+        window.location.href = redirectTarget;
       })
       .catch(function (err) {
         console.error("[MATEX Supabase] password auth threw:", err);
