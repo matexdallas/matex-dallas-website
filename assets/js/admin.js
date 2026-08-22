@@ -188,7 +188,12 @@
 
   function actionsCellHtml(m) {
     if (m.id !== editingMemberId) {
-      return '<button type="button" class="btn btn-outline-navy btn-sm" data-action="edit-name">Edit</button>';
+      return (
+        '<div class="row-actions">' +
+        '<button type="button" class="btn btn-outline-navy btn-sm" data-action="edit-name">Edit</button>' +
+        '<button type="button" class="btn btn-deny btn-sm" data-action="delete-member">Delete</button>' +
+        "</div>"
+      );
     }
     return (
       '<div class="row-actions">' +
@@ -364,6 +369,35 @@
     if (action === "toggle-dues") {
       expandedDuesMemberId = expandedDuesMemberId === memberId ? null : memberId;
       refreshMembersTable();
+      return;
+    }
+
+    if (action === "delete-member") {
+      var member = allMembers.find(function (mm) { return mm.id === memberId; });
+      var confirmName = member ? fullName(member) : "this member";
+      // A confirm() prompt here is a deliberate exception to the rest of
+      // this file's no-confirm-dialog style (see dues payment "Remove",
+      // which has none) — deleting a member is a lot harder to shrug off
+      // than removing one payment row, and it also cascades to that
+      // member's whole dues payment history (see
+      // 010_members_delete_admin.sql).
+      if (!window.confirm("Delete " + confirmName + "? This also deletes their logged dues payment history. This cannot be undone.")) {
+        return;
+      }
+
+      btn.disabled = true;
+      sb.from("members")
+        .delete()
+        .eq("id", memberId)
+        .then(function (res) {
+          if (res.error) throw res.error;
+          if (expandedDuesMemberId === memberId) expandedDuesMemberId = null;
+          return loadMembers();
+        })
+        .catch(function (err) {
+          console.error("[MATEX Supabase] members delete error:", err && err.message ? err.message : err);
+          btn.disabled = false;
+        });
       return;
     }
 
