@@ -71,4 +71,61 @@ revoke all on function public.request_app_access(text,text) from public,anon;
 revoke all on function public.review_app_access(uuid,text,uuid) from public,anon;
 revoke all on function public.app_membership_details() from public,anon;
 grant execute on function public.request_app_access(text,text),public.review_app_access(uuid,text,uuid),public.app_membership_details() to authenticated;
+create or replace function public.app_is_admin()
+returns boolean language sql stable security definer set search_path='' as $$
+ select auth.uid() is not null and (exists(select 1 from public.admins where id=auth.uid()) or exists(select 1 from public.admin_users where user_id=auth.uid() and is_active and role in ('super_admin','membership_admin','treasurer')));
+$$;
+create table if not exists public.app_payment_reports(
+ id uuid primary key default gen_random_uuid(),user_id uuid not null references auth.users(id),member_id uuid not null references public.members(id),
+ purpose text not null check(purpose in ('membership','donation')),membership_id uuid references public.memberships(id),
+ amount numeric(12,2) not null check(amount>0 and amount<=100000),payment_method text not null check(payment_method in ('zelle','paypal')),
+ payment_date date not null,payment_reference text,status text not null default 'pending' check(status in ('pending','approved','denied')),
+ created_at timestamptz not null default now(),reviewed_at timestamptz,reviewed_by uuid references auth.users(id),
+ check((purpose='membership' and membership_id is not null) or (purpose='donation' and membership_id is null))
+);
+create table if not exists public.community_center_donations(
+ id uuid primary key default gen_random_uuid(),member_id uuid references public.members(id),amount numeric(12,2) not null check(amount>0),payment_method text not null,
+ payment_date date not null,payment_reference text,report_id uuid unique references public.app_payment_reports(id),created_at timestamptz not null default now()
+);
+alter table public.app_payment_reports enable row level security;
+alter table public.community_center_donations enable row level security;
+drop policy if exists app_reports_read on public.app_payment_reports;
+create policy app_reports_read on public.app_payment_reports for select to authenticated using(user_id=auth.uid() or public.app_is_admin());
+drop policy if exists app_donations_read on public.community_center_donations;
+create policy app_donations_read on public.community_center_donations for select to authenticated using(public.app_is_admin() or exists(select 1 from public.members where id=member_id and auth_user_id=auth.uid() and status='active'));
+grant select on public.app_payment_reports,public.community_center_donations to authenticated;
+create or replace function public.app_report_payment(p_purpose text,p_membership_id uuid,p_amount numeric,p_method text,p_date date,p_reference text default null)
+returns uuid language plpgsql security definer set search_path='' as $$
+declare v_member uuid;v_id uuid;
+begin
+ select id into v_member from public.members where auth_user_id=auth.uid() and status='active';
+ if v_member is null then raise exception 'Approved active membership account required'; end if;
+ if p_purpose is null or p_purpose not in ('membership','donation') or p_amount is null or p_amount<=0 or p_amount>100000 or p_amount<>round(p_amount,2) or p_method is null or p_method not in ('zelle','paypal') or p_date is null or p_date>current_date or length(p_reference)>200 then raise exception 'Invalid payment report'; end if;
+ if p_purpose='membership' and not exists(select 1 from public.membership_members where member_id=v_member and membership_id=p_membership_id) then raise exception 'Select your linked membership'; end if;
+ if p_purpose='donation' and p_membership_id is not null then raise exception 'Donations must be separate from dues'; end if;
+ perform pg_advisory_xact_lock(hashtextextended(auth.uid()::text,1));
+ if exists(select 1 from public.app_payment_reports where user_id=auth.uid() and purpose=p_purpose and membership_id is not distinct from p_membership_id and amount=p_amount and payment_method=p_method and payment_date=p_date and payment_reference is not distinct from p_reference and status in ('pending','approved')) then raise exception 'A matching report already exists. Contact the treasurer if this is a separate payment.'; end if;
+ insert into public.app_payment_reports(user_id,member_id,purpose,membership_id,amount,payment_method,payment_date,payment_reference) values(auth.uid(),v_member,p_purpose,p_membership_id,p_amount,p_method,p_date,p_reference) returning id into v_id;
+ return v_id;
+end $$;
+create or replace function public.app_verify_payment(p_report_id uuid,p_decision text)
+returns void language plpgsql security definer set search_path='' as $$
+declare r public.app_payment_reports%rowtype;
+begin
+ if not exists(select 1 from public.admins where id=auth.uid()) and not exists(select 1 from public.admin_users where user_id=auth.uid() and is_active and role in ('super_admin','treasurer')) then raise exception 'Treasurer permission required'; end if;
+ if p_decision is null or p_decision not in ('approved','denied') then raise exception 'Invalid decision'; end if;
+ select * into r from public.app_payment_reports where id=p_report_id and status='pending' for update;
+ if not found then raise exception 'Pending payment report not found'; end if;
+ if p_decision='approved' then
+  if r.purpose='membership' then
+   insert into public.payments(membership_id,member_id,amount,payment_date,payment_method,payment_reference,payment_type,notes) values(r.membership_id,r.member_id,r.amount,r.payment_date,r.payment_method,r.payment_reference,'partial','Verified app report: '||r.id::text);
+  else
+   insert into public.community_center_donations(member_id,amount,payment_date,payment_method,payment_reference,report_id) values(r.member_id,r.amount,r.payment_date,r.payment_method,r.payment_reference,r.id);
+  end if;
+ end if;
+ update public.app_payment_reports set status=p_decision,reviewed_at=now(),reviewed_by=auth.uid() where id=r.id;
+end $$;
+revoke all on function public.app_is_admin(),public.app_report_payment(text,uuid,numeric,text,date,text),public.app_verify_payment(uuid,text) from public,anon;
+grant execute on function public.app_is_admin(),public.app_report_payment(text,uuid,numeric,text,date,text),public.app_verify_payment(uuid,text) to authenticated;
+
 commit;
